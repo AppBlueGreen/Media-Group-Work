@@ -59,7 +59,27 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
         g.setColor(Color.RED);
         for (Enemy enemy : enemies) {
             g.fillOval(enemy.x, enemy.y, enemy.size, enemy.size);
-            enemy.y++; 
+            moveTowardsPlayer(enemy);
+        }
+    }
+
+    private void moveTowardsPlayer(Enemy enemy) {
+        // プレイヤーの中心座標
+        double playerCenterX = playerX + PLAYER_WIDTH / 2;
+        double playerCenterY = HEIGHT - PLAYER_HEIGHT - 10;
+    
+        // 敵とプレイヤーの距離の差
+        double dx = playerCenterX - enemy.x;
+        double dy = playerCenterY - enemy.y;
+    
+        double distance = Math.sqrt(dx * dx + dy * dy);
+        double speed = 1.5; // 敵の移動速度
+        if (distance > 0) {
+            enemy.x += (int) (dx / distance * speed);
+            enemy.y += (int) (dy / distance * speed);
+        } else { // game over
+            timer.stop();
+            JOptionPane.showMessageDialog(this, "Game Over!", "Game Over", JOptionPane.INFORMATION_MESSAGE);
         }
     }
 
