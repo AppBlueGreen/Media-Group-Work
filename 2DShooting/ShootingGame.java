@@ -3,6 +3,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Random;
 
 class Bullet {
     protected int x, y, width = 5, height = 10;
@@ -69,12 +70,51 @@ class Player {
     }
 }
 
+class Fellow {
+    protected int x, y, size = 20;
+
+    public Fellow(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    public void draw(Graphics g) {
+        g.setColor(Color.GREEN);
+        g.fillOval(x, y, size, size);
+    }
+}
+
+class PlusWall {
+    protected int x1, x2, y;
+
+    protected int plusNumber;
+
+    public PlusWall(int x1, int x2, int y) {
+        this.x1 = x1;
+        this.x2 = x2;
+        this.y = y;
+        plusNumber = (int)(Math.random() * 5) + 1;
+    }
+
+    public void draw(Graphics g) {
+        g.setColor(Color.BLUE);
+        g.drawLine(x1, y, x2, y);
+    }
+
+    public void move() {
+        y++;
+    }
+}
+
 ////////////////////////////////////////////////
 // Model (M)
 
 class ShootingModel {
     private ArrayList<Bullet> bullets = new ArrayList<>();
     private ArrayList<Enemy> enemies = new ArrayList<>();
+    private ArrayList<Fellow> fellows = new ArrayList<>();
+    private ArrayList<PlusWall> plusWalls = new ArrayList<>();
+
     private Player player;
 
     public static final int WIDTH = 400;
@@ -83,14 +123,29 @@ class ShootingModel {
     public ShootingModel() {
         player = new Player(WIDTH / 2 - 10, HEIGHT - 40);
         spawnEnemies();
+        spawnPlusWall();
     }
 
+    // 出現に関するメソッド
     public void spawnEnemies() {
         for (int i = 0; i < 10; i++) {
             enemies.add(new Enemy((int) (Math.random() * WIDTH), (int) (Math.random() * HEIGHT / 2)));
         }
     }
 
+    public void spawnPlusWall() {
+        for (int i = 0; i < 2; i++) {
+            plusWalls.add(new PlusWall((int) (Math.random() * WIDTH), (int) (Math.random() * WIDTH), (int) (Math.random() * HEIGHT / 2)));
+        }
+    }
+
+    public void spawnFellows(int number) {
+        for (int i = 0; i < number; i++) {
+            fellows.add(new Fellow(getPlayer().x + (int)(Math.random() * 201) -100, getPlayer().y + (int)(Math.random() * 201) -100));
+        }
+    }
+
+    // 値取得に関するメソッド
     public ArrayList<Bullet> getBullets() {
         return bullets;
     }
@@ -103,6 +158,15 @@ class ShootingModel {
         return player;
     }
 
+    public ArrayList<Fellow> getFellows() {
+        return fellows;
+    }
+
+    public ArrayList<PlusWall> getPlusWall() {
+        return plusWalls;
+    }
+
+    // 移動に関するメソッド
     public void moveBullets() {
         bullets.removeIf(bullet -> {
             bullet.move();
@@ -116,7 +180,14 @@ class ShootingModel {
         }
     }
 
-    public void checkCollisions() {
+    public void movePlusWalls() {
+        plusWalls.removeIf(plusWall -> {
+            plusWall.move();
+            return plusWall.y > HEIGHT;
+        });
+    }
+
+    public void checkCollisions() { // 弾と敵の衝突判定
         Iterator<Enemy> enemyIterator = enemies.iterator();
         while (enemyIterator.hasNext()) {
             Enemy enemy = enemyIterator.next();
@@ -127,6 +198,16 @@ class ShootingModel {
                     bullets.remove(bullet);
                     break;
                 }
+            }
+        }
+    }
+
+    // playerとplusWallの衝突判定
+    public void checkPlusWallCollisions() {
+        for (PlusWall plusWall : plusWalls) {
+            if (new Rectangle(player.x, player.y, player.size, player.size)
+                    .intersects(new Rectangle(plusWall.x1, plusWall.y, plusWall.x2 - plusWall.x1, 1))) {
+                spawnFellows(plusWall.plusNumber);
             }
         }
     }
@@ -157,6 +238,14 @@ class ViewPanel extends JPanel {
         for (Enemy enemy : model.getEnemies()) {
             enemy.draw(g);
         }
+
+        for (PlusWall plusWall : model.getPlusWall()) {
+            plusWall.draw(g);
+        }
+
+        for (Fellow fellow : model.getFellows()) {
+            fellow.draw(g);
+        }
     }
 }
 
@@ -171,7 +260,7 @@ class Controller implements KeyListener, ActionListener {
     public Controller(ShootingModel model, ViewPanel view) {
         this.model = model;
         this.view = view;
-        this.timer = new javax.swing.Timer(20, this);
+        this.timer = new javax.swing.Timer(10, this);
         this.timer.start();
         view.addKeyListener(this);
     }
@@ -180,7 +269,9 @@ class Controller implements KeyListener, ActionListener {
     public void actionPerformed(ActionEvent e) {
         model.moveBullets();
         model.updateEnemies();
+        model.movePlusWalls();
         model.checkCollisions();
+        model.checkPlusWallCollisions();
         view.repaint();
     }
 
