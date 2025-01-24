@@ -82,6 +82,10 @@ class Fellow {
         g.setColor(Color.GREEN);
         g.fillOval(x, y, size, size);
     }
+
+    public void moveFellow(Player player) {
+        x = player.x;
+    }
 }
 
 class PlusWall {
@@ -260,7 +264,7 @@ class Controller implements KeyListener, ActionListener {
     public Controller(ShootingModel model, ViewPanel view) {
         this.model = model;
         this.view = view;
-        this.timer = new javax.swing.Timer(10, this);
+        this.timer = new javax.swing.Timer(20, this);
         this.timer.start();
         view.addKeyListener(this);
     }
