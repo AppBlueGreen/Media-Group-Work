@@ -344,7 +344,9 @@ class ViewPanel extends JPanel {
 class Controller implements KeyListener, ActionListener {
     private ShootingModel model;
     private ViewPanel view;
-    private javax.swing.Timer timer;
+    private javax.swing.Timer timer, delayTimer;
+
+    private boolean canFiringEvent = true;
 
     public Controller(ShootingModel model, ViewPanel view) {
         this.model = model;
@@ -352,10 +354,19 @@ class Controller implements KeyListener, ActionListener {
         this.timer = new javax.swing.Timer(20, this);
         this.timer.start();
         view.addKeyListener(this);
+
+        delayTimer = new javax.swing.Timer(1000, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                canFiringEvent = true;
+            }
+        });
+        delayTimer.start();
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
+
         model.moveBullets();
         model.updateEnemies();
         model.movePlusWalls();
@@ -388,9 +399,14 @@ class Controller implements KeyListener, ActionListener {
             }
         } else if (e.getKeyCode() == KeyEvent.VK_SPACE) {
 
-            model.getBullets().add(new Bullet(player.x + player.size / 2 - 2, player.y));
-            for (Fellow fellow : fellows) {
-                model.getBullets().add(new Bullet(fellow.x + fellow.size / 2 - 2, fellow.y));
+            if(canFiringEvent) {
+                
+                model.getBullets().add(new Bullet(player.x + player.size / 2 - 2, player.y));
+                for (Fellow fellow : fellows) {
+                    model.getBullets().add(new Bullet(fellow.x + fellow.size / 2 - 2, fellow.y));
+                }
+
+                canFiringEvent = false;
             }
         }
     }
