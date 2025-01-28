@@ -105,8 +105,7 @@ class PlusWall {
         x = (int)(Math.random() * width) + 1;
         x1 = x;
         x2 = x + width;
-        // plusNumber = (int)(Math.random() * 5) + 1;
-        plusNumber = 1;
+        plusNumber = (int)(Math.random() * 5) + 1;
     }
 
     public void draw(Graphics g) {
@@ -129,7 +128,7 @@ class MinusWall {
         x = (int)(Math.random() * width) + 1;
         x1 = x;
         x2 = x + width;
-        minusNumber = 1;
+        minusNumber = (int)(Math.random() * 5) + 1;
     }
 
     public void draw(Graphics g) {
@@ -263,7 +262,7 @@ class ShootingModel {
 
     public void checkPlusWallCollisions() { // playerとplusWallの衝突判定
         for (PlusWall plusWall : plusWalls) {
-            if (new Rectangle(player.x, player.y, player.size, player.size).intersects(new Rectangle(plusWall.x1, plusWall.y, plusWall.x2 - plusWall.x1, 1))) {
+            if (new Rectangle(player.x, player.y, player.size, 1).intersects(new Rectangle(plusWall.x1, plusWall.y, plusWall.x2 - plusWall.x1, 1))) {
                 spawnFellows(plusWall.plusNumber);
                 break;
             }
@@ -272,7 +271,7 @@ class ShootingModel {
 
     public void checkMinusWallCollisions() { // playerとminusWallの衝突判定
         for (MinusWall minusWall : minusWalls) {
-            if (new Rectangle(player.x, player.y, player.size, player.size).intersects(new Rectangle(minusWall.x1, minusWall.y, minusWall.x2 - minusWall.x1, 1))) {
+            if (new Rectangle(player.x, player.y, player.size, 1).intersects(new Rectangle(minusWall.x1, minusWall.y, minusWall.x2 - minusWall.x1, 1))) {
                 
                 if (fellows.size() == 0)
                     break;
@@ -376,16 +375,19 @@ class Controller implements KeyListener, ActionListener {
         ArrayList<Fellow> fellows = model.getFellows();
 
         if (e.getKeyCode() == KeyEvent.VK_LEFT && player.x > 0) {
+
             player.x -= 5;
             for (Fellow fellow : fellows) {
                 fellow.moveFellow(player);
             }
         } else if (e.getKeyCode() == KeyEvent.VK_RIGHT && player.x < ShootingModel.WIDTH - player.size) {
+
             player.x += 5;
             for (Fellow fellow : fellows) {
                 fellow.moveFellow(player);
             }
         } else if (e.getKeyCode() == KeyEvent.VK_SPACE) {
+
             model.getBullets().add(new Bullet(player.x + player.size / 2 - 2, player.y));
             for (Fellow fellow : fellows) {
                 model.getBullets().add(new Bullet(fellow.x + fellow.size / 2 - 2, fellow.y));
