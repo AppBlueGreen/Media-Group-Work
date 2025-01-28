@@ -94,50 +94,51 @@ class Fellow {
     }
 }
 
-class PlusWall {
-    protected int width, x, y;
+class Wall {
+    protected int width, y;
     protected int x1, x2;
+
+    public Wall(int WIDTH, int x, int y) {
+        width = WIDTH / 2;
+        x1 = x;
+        x2 = x1 + width;
+        this.y = y;
+    }
+
+    public void draw(Graphics g) { }
+
+    public void move() { y++;}
+}
+
+
+
+class PlusWall extends Wall{
+
     protected int plusNumber;
 
-    public PlusWall(int WIDTH, int y) {
-        width = WIDTH / 2;
-        this.y = y;
-        x = (int)(Math.random() * width) + 1;
-        x1 = x;
-        x2 = x + width;
+    public PlusWall(int WIDTH, int x, int y) {
+        super(WIDTH, x, y);
         plusNumber = (int)(Math.random() * 5) + 1;
     }
 
     public void draw(Graphics g) {
-        g.setColor(Color.BLUE);
         g.drawLine(x1, y, x2, y);
-    }
-
-    public void move() {
-        y++;
+        g.setColor(Color.RED);
     }
 }
 
-class MinusWall {
-    protected int width, x, y, x1, x2;
+class MinusWall extends Wall{
+
     protected int minusNumber;
 
-    public MinusWall(int WIDTH, int y) {
-        width = WIDTH / 2;
-        this.y = y;
-        x = (int)(Math.random() * width) + 1;
-        x1 = x;
-        x2 = x + width;
-        minusNumber = (int)(Math.random() * 5) + 1;
+    public MinusWall(int WIDTH, int x, int y) {
+        super(WIDTH, x, y);
+        minusNumber = (int)(Math.random() * 10) + 1;
     }
 
     public void draw(Graphics g) {
-        g.setColor(Color.RED);
         g.drawLine(x1, y, x2, y);
-    }
-
-    public void move() {
-        y++;
+        g.setColor(Color.BLUE);
     }
 }
 
@@ -158,26 +159,27 @@ class ShootingModel {
     public ShootingModel() {
         player = new Player(WIDTH / 2 - 10, HEIGHT - 100);
         spawnEnemies();
-        spawnPlusWall();
-        spawnMinusWall();
+        spawnWall();
     }
 
     // 出現に関するメソッド
     public void spawnEnemies() {
         for (int i = 0; i < 10; i++) {
-            enemies.add(new Enemy((int) (Math.random() * WIDTH), (int) (Math.random() * HEIGHT / 2)));
+            enemies.add(new Enemy((int) (Math.random() * WIDTH), (int) (Math.random() * HEIGHT / 4)));
         }
     }
 
-    public void spawnPlusWall() {
-        for (int i = 0; i < 2; i++) {
-            plusWalls.add(new PlusWall(WIDTH, (int)(Math.random() * HEIGHT / 2)));
-        }
-    }
+    public void spawnWall() {
 
-    public void spawnMinusWall() {
-        for (int i = 0; i < 2; i++) {
-            minusWalls.add(new MinusWall(WIDTH, (int)(Math.random() * HEIGHT / 2)));
+        double random = Math.random();
+        int middle = WIDTH/2;
+
+        if(random < 0.5) {
+            plusWalls.add(new PlusWall(WIDTH, 0, 0));
+            minusWalls.add(new MinusWall(WIDTH, 200, 0));
+        } else {
+            plusWalls.add(new PlusWall(WIDTH, 200, 0));
+            minusWalls.add(new MinusWall(WIDTH,0, 0));       
         }
     }
 
@@ -368,8 +370,7 @@ class Controller implements KeyListener, ActionListener {
             @Override
             public void actionPerformed(ActionEvent e) {
                 model.spawnEnemies();
-                model.spawnPlusWall();
-                model.spawnMinusWall();
+                model.spawnWall();
             }
         });
         spawnTimer.start();
