@@ -344,7 +344,7 @@ class ViewPanel extends JPanel {
 class Controller implements KeyListener, ActionListener {
     private ShootingModel model;
     private ViewPanel view;
-    private javax.swing.Timer timer, delayTimer;
+    private javax.swing.Timer timer, firingTimer, spawnTimer;
 
     private boolean canFiringEvent = true;
 
@@ -355,14 +355,26 @@ class Controller implements KeyListener, ActionListener {
         this.timer.start();
         view.addKeyListener(this);
 
-        delayTimer = new javax.swing.Timer(1000, new ActionListener() {
+        firingTimer = new javax.swing.Timer(1000, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 canFiringEvent = true;
             }
         });
-        delayTimer.start();
+        firingTimer.start();
+
+        spawnTimer = new javax.swing.Timer(5000, new ActionListener() {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                model.spawnEnemies();
+                model.spawnPlusWall();
+                model.spawnMinusWall();
+            }
+        });
+        spawnTimer.start();
     }
+
 
     @Override
     public void actionPerformed(ActionEvent e) {
