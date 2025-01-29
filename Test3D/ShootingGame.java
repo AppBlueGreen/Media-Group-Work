@@ -23,6 +23,8 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
     private ArrayList<Enemy> enemies = new ArrayList<>();
     private ArrayList<Ray> walls1 = new ArrayList<>();
     private ArrayList<Ray> fieldWalls = new ArrayList<>();
+
+    private ArrayList<Building> buildings = new ArrayList<>();
     private Image enemyImage;
     private Image gun;
     // private Image buckGraund;
@@ -54,6 +56,8 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
         walls1.add(new Ray(new Vec(300, 500), new Vec(325, 500).sub(new Vec(300, 500))));
         walls1.add(new Ray(new Vec(325, 525), new Vec(300, 525).sub(new Vec(325, 525))));
         walls1.add(new Ray(new Vec(325, 525), new Vec(325, 500).sub(new Vec(325, 525))));
+
+        buildings.add(new Building(new Vec(100, 100), 20, 30, 10, Color.GRAY));
 
         fieldWalls.add(new Ray(new Vec(0, 0), new Vec(WIDTH, 0).sub(new Vec(0, 0))));
         fieldWalls.add(new Ray(new Vec(0, 0), new Vec(0, HEIGHT).sub(new Vec(0, 0))));
@@ -220,19 +224,19 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
 
         // これがBuildingクラスのbeamと交差しているか判定
         // 変数名等変更すべき場所等は変更して使う
-        // for (Building bill : bills) {
-        //     Ray beam = new Ray(player.getPos(), new Vec(Math.cos(angle), Math.sin(angle)));
-        //     for(Ray line : bill.lines){
-        //         Vec hit = beam.intersection(line);
-        //         if (hit != null) {
-        //             double wallDist = hit.sub(player.getPos()).mag();
-        //             double wallPerpDist = wallDist * Math.cos(angle - player.getAngle()); // 修正点
-        //             // int brightness = (int) Math.max(0, Math.min(255, 255 - wallPerpDist * 10));
-        //             // wallHits.add(new WallHit(hit, wallPerpDist, new Color(brightness, brightness, brightness), 1));
-        //             wallHits.add(new WallHit(hit, wallPerpDist, angle, bill.color, 4));
-        //         }
-        //     }
-        // }
+        for (Building bill : buildings) {
+            Ray beam = new Ray(player.getPos(), new Vec(Math.cos(angle), Math.sin(angle)));
+            for(Ray line : bill.lines){
+                Vec hit = beam.intersection(line);
+                if (hit != null) {
+                    double wallDist = hit.sub(player.getPos()).mag();
+                    double wallPerpDist = wallDist * Math.cos(angle - player.getAngle()); // 修正点
+                    // int brightness = (int) Math.max(0, Math.min(255, 255 - wallPerpDist * 10));
+                    // wallHits.add(new WallHit(hit, wallPerpDist, new Color(brightness, brightness, brightness), 1));
+                    wallHits.add(new WallHit(hit, wallPerpDist, angle, bill.color, 4));
+                }
+            }
+        }
     }
     private void draw3DWalls(Graphics2D g2d, ArrayList<WallHit> wallHits, Player player, double fov, ArrayList<Enemy> enemies, ArrayList<Bullet> bullets) {
         
@@ -265,12 +269,12 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
                 g2d.drawLine((int) (getWidth() / 2 + (wallHit.angle - player.getAngle()) * getWidth() / fov), wallY1,
                              (int) (getWidth() / 2 + (wallHit.angle - player.getAngle()) * getWidth() / fov), wallY2);
             }
-            // if(wallHit.wallNumber == 4){
-            //     wallY2 = (int)(screenCenterY - wallHeight * (ビルの高さ));
-            //     g2d.setColor(wallHit.color);
-            //     g2d.drawLine((int) (getWidth() / 2 + (wallHit.angle - player.getAngle()) * getWidth() / fov), wallY1,
-            //                  (int) (getWidth() / 2 + (wallHit.angle - player.getAngle()) * getWidth() / fov), wallY2);
-            // }
+            if(wallHit.wallNumber == 4){
+                wallY2 = (int)(screenCenterY - wallHeight * 10);
+                g2d.setColor(wallHit.color);
+                g2d.drawLine((int) (getWidth() / 2 + (wallHit.angle - player.getAngle()) * getWidth() / fov), wallY1,
+                             (int) (getWidth() / 2 + (wallHit.angle - player.getAngle()) * getWidth() / fov), wallY2);
+            }
         }
     }
     
@@ -451,4 +455,30 @@ class Ray {
         }
         return null;
     }
+}
+
+class Building {
+    Vec pos;
+    private double vertical, width, height;
+    ArrayList<Ray> lines = new ArrayList<>();
+    Color color;
+
+
+    public Building(Vec pos, double vertical, double width, double height, Color color) {
+        this.pos = pos;
+        this.vertical = vertical;
+        this.width = width;
+        this.height = height;
+        this.color = color;
+
+        Vec vec1 = new Vec(width, 0);
+        Vec vec2 = new Vec(0, vertical);
+
+        this.lines.add(new Ray(pos, vec1));
+        this.lines.add(new Ray(pos, vec2));
+        this.lines.add(new Ray(pos.add(vec2), vec1));
+        this.lines.add(new Ray(pos.add(vec1), vec2));
+    }
+
+    public void draw(Graphics g) { }
 }
