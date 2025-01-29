@@ -1,6 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Random;
@@ -24,7 +25,7 @@ class Bullet {
 }
 
 class Enemy {
-    protected int x, y, size, HP;
+    protected int x, y, size;
 
     public Enemy(int x, int y) {
         this.x = x;
@@ -59,10 +60,11 @@ class Enemy {
 
 class SmallEnemy extends Enemy {
 
+    int HP = 3;
+
     public SmallEnemy(int x, int y) {
         super(x, y);
         size = 20;
-        HP = 1;
     }
 
     @Override
@@ -73,12 +75,12 @@ class SmallEnemy extends Enemy {
 }
 
 class Boss extends Enemy{
-    protected int x, y, size = 30, HP = 50;
+
+    int HP = 30;
 
     public Boss (int x, int y) { 
         super(x, y);
         size = 30;
-        HP = 50;
     }
 
     @Override
@@ -173,8 +175,8 @@ class PlusWall extends Wall{
     }
 
     public void draw(Graphics g) {
-        g.drawLine(x1, y, x2, y);
         g.setColor(Color.RED);
+        g.drawLine(x1, y, x2, y);
     }
 }
 
@@ -188,8 +190,8 @@ class MinusWall extends Wall{
     }
 
     public void draw(Graphics g) {
-        g.drawLine(x1, y, x2, y);
         g.setColor(Color.BLUE);
+        g.drawLine(x1, y, x2, y);
     }
 }
 
@@ -198,13 +200,16 @@ class MinusWall extends Wall{
 
 class ShootingModel {
     private ArrayList<Bullet> bullets = new ArrayList<>();
-    // private ArrayList<Enemy> enemies = new ArrayList<>();
+
     private ArrayList<SmallEnemy> smallEnemies = new ArrayList<>();
-    private ArrayList<Boss> boss = new ArrayList<>();
+    private ArrayList<Boss> bosses = new ArrayList<>();
+
     private ArrayList<Fellow> fellows = new ArrayList<>();
     private ArrayList<PlusWall> plusWalls = new ArrayList<>();
     private ArrayList<MinusWall> minusWalls = new ArrayList<>();
     private Player player;
+
+    int score = 0;
 
     public static final int WIDTH = 400;
     public static final int HEIGHT = 800;
@@ -217,6 +222,10 @@ class ShootingModel {
     }
 
     // 出現に関するメソッド
+    public void spawnBoss() {
+        bosses.add(new Boss(WIDTH/2, 0));
+    }
+
     public void spawnEnemies() {
         for (int i = 0; i < 10; i++) {
             smallEnemies.add(new SmallEnemy((int) (Math.random() * WIDTH), (int) (Math.random() * HEIGHT / 4)));
@@ -254,6 +263,10 @@ class ShootingModel {
         return smallEnemies;
     }
 
+    public ArrayList<Boss> getBoss() {
+        return bosses;
+    }
+
     public Player getPlayer() {
         return player;
     }
@@ -284,6 +297,12 @@ class ShootingModel {
         }
     }
 
+    public void updateBoss() {
+        for (Boss boss : bosses) {
+            boss.moveTowardsPlayer(player);
+        }
+    }
+
     public void movePlusWalls() {
         plusWalls.removeIf(plusWall -> {
             plusWall.move();
@@ -308,10 +327,41 @@ class ShootingModel {
                 if (new Rectangle(bullet.x, bullet.y, bullet.width, bullet.height)
                         .intersects(new Rectangle(smallEnemy.x, smallEnemy.y, smallEnemy.size, smallEnemy.size))) {
 
-                    smallEnemyIterator.remove();
                     smallEnemy.HP--;
-                    if(smallEnemy.HP == 0)
-                        bullets.remove(bullet);
+                    bullets.remove(bullet);
+                    
+                    if(smallEnemy.HP == 0) {
+                        smallEnemyIterator.remove();
+                        score++;
+
+                        if(score == 10) {
+                            spawnBoss();
+                        }
+                    }
+
+                    break;
+                }
+            }
+        }
+    }
+
+
+    public void checkBossllision() { // 弾とボスキャラの衝突判定
+        Iterator<Boss> bossIterator = bosses.iterator();
+        while (bossIterator.hasNext()) {
+            Boss boss = bossIterator.next();
+            for (Bullet bullet : bullets) {
+                if(new Rectangle(bullet.x, bullet.y, bullet.width, bullet.height).intersects(new Rectangle(boss.x, boss.y, boss.size, boss.size))) {
+
+                    boss.HP--;
+                    bullets.remove(bullet);
+                    
+                    if(boss.HP == 0) {
+                        bossIterator.remove(); 
+                        bosses.remove(boss);  
+                    }
+                          
+                         
 
                     break;
                 }
@@ -385,6 +435,10 @@ class ViewPanel extends JPanel {
             smallEnemy.draw(g);
         }
 
+        for (Boss boss : model.getBoss()) {
+            boss.draw(g);
+        }
+
         for (PlusWall plusWall : model.getPlusWall()) {
             plusWall.draw(g);
         }
@@ -442,10 +496,12 @@ class Controller implements KeyListener, ActionListener {
 
         model.moveBullets();
         model.updateEnemies();
+        model.updateBoss();
         model.movePlusWalls();
         model.moveMinusWalls();
 
         model.checkCollisions();
+        model.checkBossllision();
         model.checkPlusWallCollisions();
         model.checkFellowCollisions();
         model.checkMinusWallCollisions();
