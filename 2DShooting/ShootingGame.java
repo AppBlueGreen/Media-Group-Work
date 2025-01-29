@@ -24,17 +24,14 @@ class Bullet {
 }
 
 class Enemy {
-    protected int x, y, size = 20;
+    protected int x, y, size, HP;
 
     public Enemy(int x, int y) {
         this.x = x;
         this.y = y;
     }
 
-    public void draw(Graphics g) {
-        g.setColor(Color.RED);
-        g.fillOval(x, y, size, size);
-    }
+    public void draw(Graphics g) { }
 
     public void moveTowardsPlayer(Player player) {
         int playerCenterX = player.x + player.size / 2;
@@ -60,6 +57,37 @@ class Enemy {
     }
 }
 
+class SmallEnemy extends Enemy {
+
+    public SmallEnemy(int x, int y) {
+        super(x, y);
+        size = 20;
+        HP = 1;
+    }
+
+    @Override
+    public void draw(Graphics g) {
+        g.setColor(Color.ORANGE);
+        g.fillOval(x, y, size, size);
+    }
+}
+
+class Boss extends Enemy{
+    protected int x, y, size = 30, HP = 50;
+
+    public Boss (int x, int y) { 
+        super(x, y);
+        size = 30;
+        HP = 50;
+    }
+
+    @Override
+    public void draw(Graphics g) {
+        g.setColor(Color.RED);
+        g.fillOval(x, y, size, size);
+    }
+}
+
 class Player {
     protected int x, y, size = 20;
 
@@ -71,6 +99,29 @@ class Player {
     public void draw(Graphics g) {
         g.setColor(Color.BLUE);
         g.fillOval(x, y, size, size);
+    }
+
+    public void moveTowardsPlayer(Player player) {
+        int playerCenterX = player.x + player.size / 2;
+        int playerCenterY = player.y + player.size / 2;
+
+        int enemyCenterX = x + size / 2;
+        int enemyCenterY = y + size / 2;
+
+        int dy = player.y - y;
+
+        if(dy < 200) {
+            if (playerCenterX < enemyCenterX) {
+                x -= 1;
+            } else {
+                x += 1;
+            }
+        }
+        if (playerCenterY < enemyCenterY) {
+            y -= 1;
+        } else {
+            y += 1;
+        }
     }
 }
 
@@ -147,7 +198,9 @@ class MinusWall extends Wall{
 
 class ShootingModel {
     private ArrayList<Bullet> bullets = new ArrayList<>();
-    private ArrayList<Enemy> enemies = new ArrayList<>();
+    // private ArrayList<Enemy> enemies = new ArrayList<>();
+    private ArrayList<SmallEnemy> smallEnemies = new ArrayList<>();
+    private ArrayList<Boss> boss = new ArrayList<>();
     private ArrayList<Fellow> fellows = new ArrayList<>();
     private ArrayList<PlusWall> plusWalls = new ArrayList<>();
     private ArrayList<MinusWall> minusWalls = new ArrayList<>();
@@ -159,29 +212,29 @@ class ShootingModel {
     public ShootingModel() {
         player = new Player(WIDTH / 2 - 10, HEIGHT - 100);
         spawnEnemies();
-        spawnWall();
+        plusWalls.add(new PlusWall(WIDTH, 0, HEIGHT/2));
+        plusWalls.add(new PlusWall(WIDTH, WIDTH/2, HEIGHT/2));
     }
 
     // 出現に関するメソッド
     public void spawnEnemies() {
         for (int i = 0; i < 10; i++) {
-            enemies.add(new Enemy((int) (Math.random() * WIDTH), (int) (Math.random() * HEIGHT / 4)));
+            smallEnemies.add(new SmallEnemy((int) (Math.random() * WIDTH), (int) (Math.random() * HEIGHT / 4)));
         }
     }
 
     public void spawnWall() {
 
         double random = Math.random();
-        int middle = WIDTH/2;
 
-        if(random < 0.5) {
+        if(random < 0.500) {
             plusWalls.add(new PlusWall(WIDTH, 0, 0));
-            minusWalls.add(new MinusWall(WIDTH, 200, 0));
+            minusWalls.add(new MinusWall(WIDTH, WIDTH/2 +5, 0));
         } else {
-            plusWalls.add(new PlusWall(WIDTH, 200, 0));
-            minusWalls.add(new MinusWall(WIDTH,0, 0));       
+            plusWalls.add(new PlusWall(WIDTH, WIDTH/2 +5, 0));
+            minusWalls.add(new MinusWall(WIDTH, 0, 0));       
         }
-    }
+    }  
 
     public void spawnFellows(int number) {
         for (int i = 0; i < number; i++) {
@@ -197,8 +250,8 @@ class ShootingModel {
         return bullets;
     }
 
-    public ArrayList<Enemy> getEnemies() {
-        return enemies;
+    public ArrayList<SmallEnemy> getSmallEnemies() {
+        return smallEnemies;
     }
 
     public Player getPlayer() {
@@ -226,8 +279,8 @@ class ShootingModel {
     }
 
     public void updateEnemies() {
-        for (Enemy enemy : enemies) {
-            enemy.moveTowardsPlayer(player);
+        for (SmallEnemy smallEnemy : smallEnemies) {
+            smallEnemy.moveTowardsPlayer(player);
         }
     }
 
@@ -248,14 +301,18 @@ class ShootingModel {
     // 衝突判定に関するメソッド
 
     public void checkCollisions() { // 弾と敵の衝突判定
-        Iterator<Enemy> enemyIterator = enemies.iterator();
-        while (enemyIterator.hasNext()) {
-            Enemy enemy = enemyIterator.next();
+        Iterator<SmallEnemy> smallEnemyIterator = smallEnemies.iterator();
+        while (smallEnemyIterator.hasNext()) {
+            SmallEnemy smallEnemy = smallEnemyIterator.next();
             for (Bullet bullet : bullets) {
                 if (new Rectangle(bullet.x, bullet.y, bullet.width, bullet.height)
-                        .intersects(new Rectangle(enemy.x, enemy.y, enemy.size, enemy.size))) {
-                    enemyIterator.remove();
-                    bullets.remove(bullet);
+                        .intersects(new Rectangle(smallEnemy.x, smallEnemy.y, smallEnemy.size, smallEnemy.size))) {
+
+                    smallEnemyIterator.remove();
+                    smallEnemy.HP--;
+                    if(smallEnemy.HP == 0)
+                        bullets.remove(bullet);
+
                     break;
                 }
             }
@@ -274,23 +331,26 @@ class ShootingModel {
     public void checkMinusWallCollisions() { // playerとminusWallの衝突判定
         for (MinusWall minusWall : minusWalls) {
             if (new Rectangle(player.x, player.y, player.size, 1).intersects(new Rectangle(minusWall.x1, minusWall.y, minusWall.x2 - minusWall.x1, 1))) {
-                
-                if (fellows.size() == 0)
-                    break;
-                fellows.remove(minusWall.minusNumber);
+
+                int removeNumber = minusWall.minusNumber;
+                int fellowNumber = fellows.size();
+
+                if(removeNumber < fellowNumber) fellows.remove(removeNumber);
+                else if(fellowNumber < removeNumber) fellows.remove(fellowNumber);
+
                 break;
             }
         }
     }
 
     public void checkFellowCollisions() { // enemyとfellowの衝突判定
-        Iterator<Enemy> enemyIterator = enemies.iterator();
-        while (enemyIterator.hasNext()) {
-            Enemy enemy = enemyIterator.next();
+        Iterator<SmallEnemy> smallEnemyIterator = smallEnemies.iterator();
+        while (smallEnemyIterator.hasNext()) {
+            Enemy smallEnemy = smallEnemyIterator.next();
             for (Fellow fellow : fellows) {
                 if (new Rectangle(fellow.x, fellow.y, fellow.size, fellow.size)
-                        .intersects(new Rectangle(enemy.x, enemy.y, enemy.size, enemy.size))) {
-                    enemyIterator.remove();
+                        .intersects(new Rectangle(smallEnemy.x, smallEnemy.y, smallEnemy.size, smallEnemy.size))) {
+                    smallEnemyIterator.remove();
                     fellows.remove(fellow);
                     break;
                 }
@@ -321,8 +381,8 @@ class ViewPanel extends JPanel {
             bullet.draw(g);
         }
 
-        for (Enemy enemy : model.getEnemies()) {
-            enemy.draw(g);
+        for (Enemy smallEnemy : model.getSmallEnemies()) {
+            smallEnemy.draw(g);
         }
 
         for (PlusWall plusWall : model.getPlusWall()) {
@@ -365,7 +425,7 @@ class Controller implements KeyListener, ActionListener {
         });
         firingTimer.start();
 
-        spawnTimer = new javax.swing.Timer(5000, new ActionListener() {
+        spawnTimer = new javax.swing.Timer(7000, new ActionListener() {
             
             @Override
             public void actionPerformed(ActionEvent e) {
