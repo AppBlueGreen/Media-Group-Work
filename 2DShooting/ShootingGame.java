@@ -195,6 +195,112 @@ class MinusWall extends Wall{
     }
 }
 
+class Vec {
+   private double x;
+   private double y;
+
+   Vec(double var1, double var3) {
+      this.x = var1;
+      this.y = var3;
+   }
+
+   Vec add(Vec var1) {
+      return new Vec(this.x + var1.x, this.y + var1.y);
+   }
+
+   Vec sub(Vec var1) {
+      return new Vec(this.x - var1.x, this.y - var1.y);
+   }
+
+   Vec mult(double var1) {
+      return new Vec(this.x * var1, this.y * var1);
+   }
+
+   double mag() {
+      return Math.sqrt(this.x * this.x + this.y * this.y);
+   }
+
+   double getX() {
+      return this.x;
+   }
+
+   double getY() {
+      return this.y;
+   }
+
+   void setX(double var1) {
+      this.x = var1;
+   }
+
+   void setY(double var1) {
+      this.y = var1;
+   }
+}
+
+
+class Ray {
+    private Vec pos;
+    private Vec dir;
+
+    Ray(Vec pos, Vec dir) {
+        this.pos = pos;
+        this.dir = dir;
+    }
+
+    Vec getBegin() {
+        return this.pos;
+    }
+
+    Vec getEnd(double maxDistance) {
+        return this.pos.add(this.dir.mult(maxDistance)); // maxDistanceに基づいて終点を計算
+    }
+
+    Vec intersection(Ray other) {
+        double x1 = this.pos.getX(), y1 = this.pos.getY();
+        double x2 = this.getEnd(1000).getX(), y2 = this.getEnd(1000).getY();
+        double x3 = other.pos.getX(), y3 = other.pos.getY();
+        double x4 = other.getEnd(1).getX(), y4 = other.getEnd(1).getY();
+
+        
+        double denom = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
+        if (Math.abs(denom) < 1e-9) return null; // 平行の場合
+
+        double t = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) / denom;
+        double u = -((x1 - x2) * (y1 - y3) - (y1 - y2) * (x1 - x3)) / denom;
+
+        if (t >= 0 && u >= 0 && u <= 1) {
+            return new Vec(x1 + t * (x2 - x1), y1 + t * (y2 - y1));
+        }
+        return null;
+    }
+}
+
+class Building {
+    private double height;
+    ArrayList<Ray> lines;
+    Color color;
+
+    public Building(double height, ArrayList<Ray> lines, Color color) {
+        this.height = height;
+        this.lines = lines;
+        this.color = color;
+    }
+
+    public void draw(Graphics g) { }
+}
+
+class Building_1 extends Building{
+
+    public Building_1(double height, ArrayList<Ray> lines, Color color) {
+        super(height, lines, color);
+    }
+
+    @Override
+    public void draw(Graphics g) {
+        
+    }
+}
+
 ////////////////////////////////////////////////
 // Model (M)
 
