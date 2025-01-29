@@ -219,6 +219,7 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
         }
 
         // これがBuildingクラスのbeamと交差しているか判定
+        // 変数名等変更すべき場所等は変更して使う
         // for (Building bill : bills) {
         //     Ray beam = new Ray(player.getPos(), new Vec(Math.cos(angle), Math.sin(angle)));
         //     for(Ray line : bill.lines){
@@ -228,7 +229,7 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
         //             double wallPerpDist = wallDist * Math.cos(angle - player.getAngle()); // 修正点
         //             // int brightness = (int) Math.max(0, Math.min(255, 255 - wallPerpDist * 10));
         //             // wallHits.add(new WallHit(hit, wallPerpDist, new Color(brightness, brightness, brightness), 1));
-        //             wallHits.add(new WallHit(hit, wallPerpDist, angle, Color.WHITE, 4));
+        //             wallHits.add(new WallHit(hit, wallPerpDist, angle, bill.color, 4));
         //         }
         //     }
         // }
