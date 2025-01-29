@@ -217,6 +217,21 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
                 wallHits.add(new WallHit(hit, wallPerpDist, angle, Color.YELLOW, 3));
             }
         }
+
+        // これがBuildingクラスのbeamと交差しているか判定
+        // for (Building bill : bills) {
+        //     Ray beam = new Ray(player.getPos(), new Vec(Math.cos(angle), Math.sin(angle)));
+        //     for(Ray line : bill.lines){
+        //         Vec hit = beam.intersection(line);
+        //         if (hit != null) {
+        //             double wallDist = hit.sub(player.getPos()).mag();
+        //             double wallPerpDist = wallDist * Math.cos(angle - player.getAngle()); // 修正点
+        //             // int brightness = (int) Math.max(0, Math.min(255, 255 - wallPerpDist * 10));
+        //             // wallHits.add(new WallHit(hit, wallPerpDist, new Color(brightness, brightness, brightness), 1));
+        //             wallHits.add(new WallHit(hit, wallPerpDist, angle, Color.WHITE, 4));
+        //         }
+        //     }
+        // }
     }
     private void draw3DWalls(Graphics2D g2d, ArrayList<WallHit> wallHits, Player player, double fov, ArrayList<Enemy> enemies, ArrayList<Bullet> bullets) {
         
@@ -249,7 +264,12 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
                 g2d.drawLine((int) (getWidth() / 2 + (wallHit.angle - player.getAngle()) * getWidth() / fov), wallY1,
                              (int) (getWidth() / 2 + (wallHit.angle - player.getAngle()) * getWidth() / fov), wallY2);
             }
-    
+            // if(wallHit.wallNumber == 4){
+            //     wallY2 = (int)(screenCenterY - wallHeight * (ビルの高さ));
+            //     g2d.setColor(wallHit.color);
+            //     g2d.drawLine((int) (getWidth() / 2 + (wallHit.angle - player.getAngle()) * getWidth() / fov), wallY1,
+            //                  (int) (getWidth() / 2 + (wallHit.angle - player.getAngle()) * getWidth() / fov), wallY2);
+            // }
         }
     }
     
