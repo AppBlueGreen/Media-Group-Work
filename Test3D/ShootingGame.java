@@ -16,7 +16,8 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
 
     // プレイヤーの位置とサイズ
     private Player player;
-    private Vec playerPos = new Vec(WIDTH / 2, HEIGHT - 40);
+    // private Vec playerPos = new Vec(WIDTH / 2, HEIGHT - 40);
+    private Vec playerPos = new Vec(WIDTH,40);
 
     // 弾と敵のリスト
     private ArrayList<Bullet> bullets = new ArrayList<>();
@@ -52,10 +53,11 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
             }
         }
 
-        // walls1.add(new Ray(new Vec(300, 500), new Vec(300, 525).sub(new Vec(300, 500))));
-        // walls1.add(new Ray(new Vec(300, 500), new Vec(325, 500).sub(new Vec(300, 500))));
-        // walls1.add(new Ray(new Vec(325, 525), new Vec(300, 525).sub(new Vec(325, 525))));
-        // walls1.add(new Ray(new Vec(325, 525), new Vec(325, 500).sub(new Vec(325, 525))));
+        // 白い壁の追加
+        walls1.add(new Ray(new Vec(300, 500), new Vec(300, 525).sub(new Vec(300, 500))));
+        walls1.add(new Ray(new Vec(300, 500), new Vec(325, 500).sub(new Vec(300, 500))));
+        walls1.add(new Ray(new Vec(325, 525), new Vec(300, 525).sub(new Vec(325, 525))));
+        walls1.add(new Ray(new Vec(325, 525), new Vec(325, 500).sub(new Vec(325, 525))));
 
         // add buildings
         buildings.add(new Building(new Vec(400, 30), 60, 150, 4, Color.RED)); // 1  学生寮
@@ -184,14 +186,26 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
 
         // 壁1を描画
         g2d.setColor(Color.WHITE);
-        g2d.setStroke(new BasicStroke(3));
+        g2d.setStroke(new BasicStroke(1));
         for (Ray wall : walls1) {
             g2d.drawLine((int) wall.getBegin().getX() / 7 + 20, (int) wall.getBegin().getY() / 7 + 20,
                          (int) wall.getEnd(1).getX() / 7 + 20, (int) wall.getEnd(1).getY() / 7 + 20);
         }
+
+        // 建物を描画
+        for(Building building : buildings) {
+            g2d.setColor(building.color);
+            g2d.setStroke(new BasicStroke(1));
+
+            for(Ray wall : building.lines) {
+                g2d.drawLine((int) wall.getBegin().getX() / 7 + 20, (int) wall.getBegin().getY() / 7 + 20,
+                (int) wall.getEnd(1).getX() / 7 + 20, (int) wall.getEnd(1).getY() / 7 + 20);
+            }
+        }
+
         // フィールドの限界を描画
         g2d.setColor(Color.WHITE);
-        g2d.setStroke(new BasicStroke(3));
+        g2d.setStroke(new BasicStroke(1));
         for (Ray wall : fieldWalls) {
             g2d.drawLine((int) wall.getBegin().getX() / 7 + 20, (int) wall.getBegin().getY() / 7 + 20,
                          (int) wall.getEnd(1).getX() / 7 + 20, (int) wall.getEnd(1).getY() / 7 + 20);
@@ -502,7 +516,7 @@ class Ray {
     }
 }
 
-class Building {
+class Building extends Ray{
     Vec pos;
     private double vertical, width, height;
     ArrayList<Ray> lines = new ArrayList<>();
@@ -510,6 +524,7 @@ class Building {
 
 
     public Building(Vec pos, double vertical, double width, double height, Color color) {
+        super(pos, pos);
         this.pos = pos;
         this.vertical = vertical;
         this.width = width;
