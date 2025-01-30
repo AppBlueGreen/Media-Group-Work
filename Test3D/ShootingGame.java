@@ -11,7 +11,7 @@ import java.util.Iterator;
 
 public class ShootingGame extends JPanel implements ActionListener, KeyListener {
     // ウィンドウのサイズ
-    private static final int WIDTH = 800;
+    private static final int WIDTH = 600;
     private static final int HEIGHT = 600;
 
     // プレイヤーの位置とサイズ
@@ -52,13 +52,58 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
             }
         }
 
-        walls1.add(new Ray(new Vec(300, 500), new Vec(300, 525).sub(new Vec(300, 500))));
-        walls1.add(new Ray(new Vec(300, 500), new Vec(325, 500).sub(new Vec(300, 500))));
-        walls1.add(new Ray(new Vec(325, 525), new Vec(300, 525).sub(new Vec(325, 525))));
-        walls1.add(new Ray(new Vec(325, 525), new Vec(325, 500).sub(new Vec(325, 525))));
+        // walls1.add(new Ray(new Vec(300, 500), new Vec(300, 525).sub(new Vec(300, 500))));
+        // walls1.add(new Ray(new Vec(300, 500), new Vec(325, 500).sub(new Vec(300, 500))));
+        // walls1.add(new Ray(new Vec(325, 525), new Vec(300, 525).sub(new Vec(325, 525))));
+        // walls1.add(new Ray(new Vec(325, 525), new Vec(325, 500).sub(new Vec(325, 525))));
 
-        buildings.add(new Building(new Vec(100, 100), 20, 30, 10, Color.GRAY));
+        // add buildings
+        buildings.add(new Building(new Vec(400, 30), 60, 150, 4, Color.RED)); // 1  学生寮
 
+        buildings.add(new Building(new Vec(430, 170), 40, 20, 5, Color.BLUE)); // 2.1　体育館
+        buildings.add(new Building(new Vec(450, 150), 80, 110, 5, Color.BLUE)); // 2.2　体育館
+
+        buildings.add(new Building(new Vec(510, 250), 40, 70, 2, Color.GREEN)); // 3　第２体育館
+
+        buildings.add(new Building(new Vec(410, 290), 60, 40, 5, Color.GRAY)); // 4　西５号館
+        buildings.add(new Building(new Vec(450, 290), 30, 40, 5, Color.GRAY)); // 5　西５号館
+
+        buildings.add(new Building(new Vec(420, 370), 30, 40, 1, Color.RED)); // 6　西食堂
+        buildings.add(new Building(new Vec(460, 350), 50, 30, 1, Color.RED)); // 7　西食堂
+
+        buildings.add(new Building(new Vec(380, 440), 40, 90, 1, Color.BLUE)); // 8　教育用計算機室
+
+        buildings.add(new Building(new Vec(490, 420), 60, 20, 10, Color.GREEN)); // 9　情報システム学研究科棟
+        buildings.add(new Building(new Vec(510, 330), 150, 50, 10, Color.GREEN)); // 10　情報システム学研究科棟
+
+        buildings.add(new Building(new Vec(110, 170), 90, 50, 10, Color.RED)); // 11　ピクトラボのところ
+
+        buildings.add(new Building(new Vec(200, 160), 10, 40, 10, Color.BLUE)); // 12　西７号館
+        buildings.add(new Building(new Vec(180, 170), 40, 100, 10, Color.BLUE)); // 13　西７号館
+
+        buildings.add(new Building(new Vec(300, 170), 40, 60, 10, Color.GREEN)); // 14　西６号館
+
+        buildings.add(new Building(new Vec(110, 300), 40, 70, 10, Color.GRAY)); // 15　西４号館
+
+        buildings.add(new Building(new Vec(190, 300), 40, 170, 10, Color.YELLOW)); // 16　西２号館
+
+        buildings.add(new Building(new Vec(100, 420), 50, 50, 5, Color.RED)); // 17　西３号館
+        buildings.add(new Building(new Vec(150, 420), 40, 40, 5, Color.RED)); // 18　西３号館
+
+        buildings.add(new Building(new Vec(220, 420), 40, 100, 5, Color.BLUE)); // 19　西１号館
+
+        buildings.add(new Building(new Vec(90, 490), 30, 50, 10, Color.GREEN)); // 20　　西９号館
+        buildings.add(new Building(new Vec(110, 520), 40, 30, 10, Color.GREEN)); // 21　西９号館
+        buildings.add(new Building(new Vec(80, 560), 40, 100, 10, Color.GREEN)); // 22　西９号館
+
+        buildings.add(new Building(new Vec(210, 490), 50, 40, 1, Color.RED)); // 23　　西８号館
+        buildings.add(new Building(new Vec(250, 520), 20, 40, 1, Color.RED)); // 24　西８号館
+        buildings.add(new Building(new Vec(290, 490), 50, 50, 1, Color.RED)); // 25　西８号館
+        buildings.add(new Building(new Vec(240, 540), 10, 100, 10, Color.RED)); // 26　西８号館
+        buildings.add(new Building(new Vec(190, 550), 30, 110, 10, Color.RED)); // 27　西８号館
+
+
+        
         fieldWalls.add(new Ray(new Vec(0, 0), new Vec(WIDTH, 0).sub(new Vec(0, 0))));
         fieldWalls.add(new Ray(new Vec(0, 0), new Vec(0, HEIGHT).sub(new Vec(0, 0))));
         fieldWalls.add(new Ray(new Vec(WIDTH, HEIGHT), new Vec(WIDTH, 0).sub(new Vec(WIDTH, HEIGHT))));
