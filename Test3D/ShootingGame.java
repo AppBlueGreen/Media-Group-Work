@@ -289,10 +289,9 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
 
         // これがBuildingクラスのbeamと交差しているか判定
         // 変数名等変更すべき場所等は変更して使う
-        int index = 0;
+        double height = 0;
         for (Building bill : buildings) {
             Ray beam = new Ray(player.getPos(), new Vec(Math.cos(angle), Math.sin(angle)));
-            index++;
             for(Ray line : bill.lines){
                 Vec hit = beam.intersection(line);
                 if (hit != null) {
@@ -301,8 +300,9 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
                     // int brightness = (int) Math.max(0, Math.min(255, 255 - wallPerpDist * 10));
                     // wallHits.add(new WallHit(hit, wallPerpDist, new Color(brightness, brightness, brightness), 1));
                     WallHit wallHit = new WallHit(hit, wallPerpDist, angle, bill.color, 4);
-                    wallHit.setIndex(index);
-                    System.out.println(index);
+                    height = bill.getHeight();
+                    wallHit.setIndex(height);
+                    // System.out.println(index);
                     wallHits.add(wallHit);
                 }
             }
@@ -341,15 +341,11 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
             }
 
             if (wallHit.wallNumber == 4) {
-                int buildingIndex = wallHit.index;
-                if (buildingIndex >= 0 && buildingIndex < buildings.size()) {
-                    Building building = buildings.get(buildingIndex);
-                    double buildingHeight = building.getHeight();
-                    wallY2 = (int)(screenCenterY - wallHeight * buildingHeight);
-                    g2d.setColor(wallHit.color);
-                    int screenX = (int) (getWidth() / 2 + (wallHit.angle - player.getAngle()) * getWidth() / fov);
-                    g2d.drawLine(screenX, wallY1, screenX, wallY2);
-                }
+                double buildingHeight = wallHit.index;
+                wallY2 = (int)(screenCenterY - wallHeight * buildingHeight);
+                g2d.setColor(wallHit.color);
+                int screenX = (int) (getWidth() / 2 + (wallHit.angle - player.getAngle()) * getWidth() / fov);
+                g2d.drawLine(screenX, wallY1, screenX, wallY2);
             }
         }
     }
@@ -397,7 +393,7 @@ class WallHit {
     double angle;        // beamの角度
     Color color;         // 壁の色
     int wallNumber;      // 壁の番号
-    int index;
+    double index;
 
     public WallHit(Vec hitPoint, double distance, double angle, Color color, int wallNumber) {
         this.hitPoint = hitPoint;
@@ -407,7 +403,7 @@ class WallHit {
         this.wallNumber = wallNumber;
     }
 
-    public void setIndex(int index) {
+    public void setIndex(double index) {
         this.index = index;
     }
 }
