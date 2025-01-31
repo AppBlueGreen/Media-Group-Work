@@ -292,6 +292,7 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
         int index = 0;
         for (Building bill : buildings) {
             Ray beam = new Ray(player.getPos(), new Vec(Math.cos(angle), Math.sin(angle)));
+            index++;
             for(Ray line : bill.lines){
                 Vec hit = beam.intersection(line);
                 if (hit != null) {
@@ -300,8 +301,8 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
                     // int brightness = (int) Math.max(0, Math.min(255, 255 - wallPerpDist * 10));
                     // wallHits.add(new WallHit(hit, wallPerpDist, new Color(brightness, brightness, brightness), 1));
                     WallHit wallHit = new WallHit(hit, wallPerpDist, angle, bill.color, 4);
-                    // wallHit.setIndex(index++);
-                    // System.out.println(index);
+                    wallHit.setIndex(index);
+                    System.out.println(index);
                     wallHits.add(wallHit);
                 }
             }
@@ -338,18 +339,18 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
                 g2d.drawLine((int) (getWidth() / 2 + (wallHit.angle - player.getAngle()) * getWidth() / fov), wallY1,
                              (int) (getWidth() / 2 + (wallHit.angle - player.getAngle()) * getWidth() / fov), wallY2);
             }
-            // ...existing code...
-            if(wallHit.wallNumber == 4){
-                 int buildingIndex = buildings.indexOf(wallHit.index);
-                // if (buildingIndex != -1) {
-                    // wallY2 = (int)(screenCenterY - wallHeight * buildings.get(buildingIndex).getHeight());
-                    wallY2 = (int)(screenCenterY - wallHeight * 10);
+
+            if (wallHit.wallNumber == 4) {
+                int buildingIndex = wallHit.index;
+                if (buildingIndex >= 0 && buildingIndex < buildings.size()) {
+                    Building building = buildings.get(buildingIndex);
+                    double buildingHeight = building.getHeight();
+                    wallY2 = (int)(screenCenterY - wallHeight * buildingHeight);
                     g2d.setColor(wallHit.color);
-                    g2d.drawLine((int) (getWidth() / 2 + (wallHit.angle - player.getAngle()) * getWidth() / fov), wallY1,
-                     (int) (getWidth() / 2 + (wallHit.angle - player.getAngle()) * getWidth() / fov), wallY2);
-                // }
-}
-// ...existing code...
+                    int screenX = (int) (getWidth() / 2 + (wallHit.angle - player.getAngle()) * getWidth() / fov);
+                    g2d.drawLine(screenX, wallY1, screenX, wallY2);
+                }
+            }
         }
     }
     
