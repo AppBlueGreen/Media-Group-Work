@@ -30,6 +30,7 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
 
     private ArrayList<Building> buildings = new ArrayList<>();
     private Image enemyImage;
+    private Image bossImage;
     private Image gun;
     // private Image buckGraund;
     private static final int TOTAL_BACKGROUNDS = 36;
@@ -42,8 +43,9 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
     public ShootingGame() {
         this.setPreferredSize(new Dimension(WIDTH, HEIGHT));
 
-        enemyImage = new ImageIcon(getClass().getResource("/creeper1.png")).getImage();
-        gun = new ImageIcon(getClass().getResource("/gun2.png")).getImage();
+        enemyImage = new ImageIcon(getClass().getResource("/ma-rusu.png")).getImage();
+        bossImage = new ImageIcon(getClass().getResource("/risaju.png")).getImage();
+        gun = new ImageIcon(getClass().getResource("/gun.png")).getImage();
         // buckGraund = new ImageIcon(getClass().getResource("/Default_superflat_world.png")).getImage();
 
         for (int i = 0; i < TOTAL_BACKGROUNDS; i++) {
@@ -181,7 +183,9 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
             getWallhits(wallHits,  player,  angle,  fov,  enemies, bullets);
         }
         draw3DWalls(g2d, wallHits, player, fov, enemies, bullets, buildings);
-        g2d.drawImage(gun, (WIDTH / 2) + 120, (HEIGHT / 2) - 250, 600, 600, null);
+
+        // 銃表示
+        g2d.drawImage(gun, (WIDTH / 2) - 150, (HEIGHT / 2) - 330, 700, 700, null);
 
         g2d.setColor(Color.BLACK);
         g2d.fillRect(WIDTH / 2 - 20, HEIGHT / 2, 40, 2);
@@ -233,7 +237,7 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
         // 弾を描画
         g2d.setColor(Color.YELLOW);
         for (Bullet bullet : bullets) {
-            g2d.fillRect((int) bullet.pos.getX() / 7 + 20, (int) bullet.pos.getY() / 7 + 20, bullet.width, bullet.height);
+            g2d.fillRect((int) bullet.pos.getX() / 7 + 20, (int) bullet.pos.getY() / 7 + 20, bullet.width / 2, bullet.height / 2);
         }
 
         // スコアを表示
@@ -359,7 +363,7 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
     
                 int screenX = (int) (getWidth() / 2 + (wallHit.angle - player.getAngle()) * getWidth() / fov - enemyWidth / 2);
                 int screenY = screenCenterY - enemyHeight / 2;
-                g2d.drawImage(enemyImage, screenX, screenY, enemyWidth, enemyHeight, null);
+                g2d.drawImage(bossImage, screenX, screenY, enemyWidth, enemyHeight, null);
             }
             if(wallHit.wallNumber == 3){
                 wallY1 = (int)(screenCenterY + wallHeight / 20);
@@ -483,8 +487,8 @@ class Vec {
 class Bullet {
     Vec pos;
     double angle;
-    int width = 2;
-    int height = 3;
+    int width = 5;
+    int height = 5;
 
     public Bullet(Vec pos, double angle) {
         this.pos = pos;
@@ -541,7 +545,7 @@ class Enemy {
 }
 class Boss {
     Vec pos;
-    int size = 4;
+    int size = 5;
     int HP = 5;
 
     public Boss(Vec pos) {
