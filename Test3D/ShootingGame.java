@@ -108,8 +108,6 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
         buildings.add(new Building(new Vec(290, 490), 50, 50, 1, Color.RED)); // 25　西８号館
         buildings.add(new Building(new Vec(240, 540), 10, 100, 10, Color.RED)); // 26　西８号館
         buildings.add(new Building(new Vec(190, 550), 30, 110, 10, Color.RED)); // 27　西８号館
-
-
         
         fieldWalls.add(new Ray(new Vec(0, 0), new Vec(FIELD_WIDTH, 0).sub(new Vec(0, 0))));
         fieldWalls.add(new Ray(new Vec(0, 0), new Vec(0, FIELD_HEIGHT).sub(new Vec(0, 0))));
@@ -146,6 +144,31 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
                 }
             }
         }
+
+        for(int i = 0; i < WIDTH; i++)
+            for(int j = 0; j < HEIGHT; j++)
+                Map[i][j] = 0;
+
+        for(Building building : buildings) {
+
+            ArrayList<Ray> lines = building.lines;
+            for(Ray line : lines) {
+
+                Vec vec = line.getBegin();
+                double width = building.getWidth();
+                double height = building.getHeight();
+
+                for(int x = (int)vec.getX(); x < width; x++) {
+
+                    for(int y = (int)vec.getY(); y < height; y++) {
+                        Map[x][y] = 1;
+                        System.out.printf("%d", Map[x][y]);
+                    }
+                    System.out.printf("\n");
+                }
+            }
+        }
+
 
         // 敵を生成
         spawnEnemies();
