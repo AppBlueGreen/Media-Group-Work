@@ -16,7 +16,7 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
     private static final int FIELD_WIDTH = 600;
     private static final int FIELD_HEIGHT = 600;
 
-    int Map[][] = new int[WIDTH][HEIGHT];
+    int Map[][] = new int[WIDTH+5][HEIGHT+5];
 
     // プレイヤーの位置とサイズ
     private Player player;
@@ -410,16 +410,27 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
 
     @Override
     public void keyPressed(KeyEvent e) {
-        // if (e.getKeyCode() == KeyEvent.VK_LEFT && playerPos.getX() > 0) {
-        //     player.setPos(new Vec(player.getPos().getX() - 10, player.getPos().getY()));
-        // }
-        // if (e.getKeyCode() == KeyEvent.VK_RIGHT && playerPos.getX() < WIDTH) {
-        //     player.setPos(new Vec(player.getPos().getX() + 10, player.getPos().getY()));
-        // }
+
+        Vec new_pos = new Vec(player.getPos().getX(), player.getPos().getY());
+        
+
         if (e.getKeyCode() == KeyEvent.VK_LEFT ) player.setAngle(player.getAngle() - Math.PI / 36);
         if (e.getKeyCode() == KeyEvent.VK_RIGHT) player.setAngle(player.getAngle() + Math.PI / 36);
-        if (e.getKeyCode() == KeyEvent.VK_W   ) player.setPos(new Vec(player.getPos().getX() + Math.cos(player.getAngle()), player.getPos().getY() + Math.sin(player.getAngle())));
-        if (e.getKeyCode() == KeyEvent.VK_S   ) player.setPos(new Vec(player.getPos().getX() - Math.cos(player.getAngle()), player.getPos().getY() - Math.sin(player.getAngle())));
+
+        if (e.getKeyCode() == KeyEvent.VK_W   ){
+            new_pos.setX(player.getPos().getX() + Math.cos(player.getAngle()));
+            new_pos.setY(player.getPos().getY() + Math.sin(player.getAngle()));
+            if(Map[(int)new_pos.getX()][(int)new_pos.getY()] == 0) {
+                player.setPos(new_pos);
+            }
+        }
+        if (e.getKeyCode() == KeyEvent.VK_S   ) {
+            new_pos.setX(player.getPos().getX() - Math.cos(player.getAngle()));
+            new_pos.setY(player.getPos().getY() - Math.sin(player.getAngle()));
+            if(Map[(int)new_pos.getX()][(int)new_pos.getY()] == 0) {
+                player.setPos(new_pos);
+            }
+        }
         if (e.getKeyCode() == KeyEvent.VK_D   ) player.setPos(new Vec(player.getPos().getX() - Math.sin(player.getAngle()), player.getPos().getY() + Math.cos(player.getAngle())));
         if (e.getKeyCode() == KeyEvent.VK_A   ) player.setPos(new Vec(player.getPos().getX() + Math.sin(player.getAngle()), player.getPos().getY() - Math.cos(player.getAngle())));
         if (e.getKeyCode() == KeyEvent.VK_SPACE) {
