@@ -225,6 +225,11 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
         for (Bullet bullet : bullets) {
             g2d.fillRect((int) bullet.pos.getX() / 7 + 20, (int) bullet.pos.getY() / 7 + 20, bullet.width, bullet.height);
         }
+
+        // スコアを表示
+        g2d.setFont(new Font("Serif", Font.BOLD, 20));
+        g2d.setColor(Color.BLACK);
+        g2d.drawString("Score : " + player.getScore(), WIDTH - 100, 30);
     }
 
     @Override
@@ -252,6 +257,7 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
 
                     if(enemy.HP == 0) {
                         enemyIterator.remove();
+                        player.addScore();
                     }
                     break;
                 }
@@ -475,10 +481,12 @@ class Bullet {
 class Player {
     private Vec pos;
     private double angle;
+    private int score;
 
     Player(Vec pos, double angle) {
         this.pos = pos;
         this.angle = angle;
+        this.score = 0;
     }
 
     Vec getPos() {
@@ -495,6 +503,12 @@ class Player {
 
     void setAngle(double angle) {
         this.angle = angle;
+    }
+    void addScore(){
+        this.score++;
+    }
+    int getScore(){
+        return this.score;
     }
 }
 // 敵のクラス
