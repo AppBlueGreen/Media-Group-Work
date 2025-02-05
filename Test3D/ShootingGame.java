@@ -294,6 +294,28 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
         g2d.setFont(new Font("Serif", Font.BOLD, 20));
         g2d.setColor(Color.BLACK);
         g2d.drawString("Score : " + player.getScore(), WIDTH - 100, 30);
+
+        // BossのHP表示
+        if(!bosses.isEmpty()){
+            for(Boss boss : bosses){
+                g2d.setFont(new Font("Serif", Font.BOLD, 20));
+                g2d.setColor(Color.BLACK);
+                g2d.drawString("ボスのHP : " + boss.getHP(), WIDTH - 650, 30);
+                int x[] = {WIDTH - 500, WIDTH - 500, WIDTH - 200, WIDTH - 200};
+                int y[] = {15         ,          35,          35,          15};
+                g2d.drawPolygon(x, y, 4);
+
+                g2d.setColor(Color.YELLOW);
+                double ratio = (double)boss.getHP() / boss.getMAXHP();
+                double len = x[2] - x[0];
+                int new_x = (int)(len * ratio + x[0]);
+                x[2] = new_x; x[3] = new_x;
+                y[0]++; y[1]--; y[2]--; y[3]++;
+                x[0]++; x[1]++; x[2]--; x[3]--;
+
+                g2d.fillPolygon(x, y, 4);
+            }
+        }
     }
 
     @Override
@@ -353,18 +375,6 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
                     }
                     break;
                 }
-            }
-        }
-
-        for(Enemy enemy : enemies) {
-
-            int x = (int)enemy.pos.getX();
-            int y = (int)enemy.pos.getY();
-
-            if(Map[x][y] == 1) {
-                enemy.setCanMoveEnemy(false);
-            } else {
-                enemy.setCanMoveEnemy(true);
             }
         }
 
@@ -638,19 +648,12 @@ class Enemy {
     public int getHP() {
         return HP;
     }
-
-    public void setCanMoveEnemy(boolean canMoveEnemy) {
-        this.canMoveEnemy = canMoveEnemy;
-    }
-
-    public boolean getCanMoveEnemy() {
-        return canMoveEnemy;
-    }
 }
 class Boss {
     Vec pos;
     int size = 5;
     int HP = 5;
+    private final int MAX_HP = 5;
 
     public Boss(Vec pos) {
         this.pos = pos;
@@ -658,6 +661,10 @@ class Boss {
 
     public int getHP() {
         return HP;
+    }
+
+    int getMAXHP(){
+        return MAX_HP;
     }
 }
 
