@@ -189,9 +189,11 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
             if(enemy.pos.sub(player.getPos()).mag() < 15){
                 continue;
             }
-            Vec direction = new Vec(player.getPos().getX() - enemy.pos.getX(), player.getPos().getY() - enemy.pos.getY());
-            double len = direction.mag();
-            enemy.pos = enemy.pos.add((new Vec(direction.getX() / (len * 2), direction.getY() / (len * 2)))); // 敵を下に動かす
+            if(enemy.pos.sub(player.getPos()).mag() < 100){
+                Vec direction = new Vec(player.getPos().getX() - enemy.pos.getX(), player.getPos().getY() - enemy.pos.getY());
+                double len = direction.mag();
+                enemy.pos = enemy.pos.add((new Vec(direction.getX() / (len * 2), direction.getY() / (len * 2)))); // 敵を下に動かす
+            }
         }  
 
         double fov = Math.PI / 2;
@@ -203,14 +205,18 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
         draw3DWalls(g2d, wallHits, player, fov, enemies, bullets, buildings);
         g2d.drawImage(gun, (WIDTH / 2) + 120, (HEIGHT / 2) - 250, 600, 600, null);
 
+        g2d.setColor(Color.BLACK);
+        g2d.fillRect(WIDTH / 2 - 20, HEIGHT / 2, 40, 2);
+        g2d.fillRect(WIDTH / 2, HEIGHT / 2 - 20, 2, 40);
         
-
+        
+        
         g2d.setColor(new Color(34, 139, 34)); // 緑
         g2d.fillRect(20, 20, FIELD_WIDTH / 7, FIELD_HEIGHT / 7);
 
         g2d.setColor(Color.RED);
         for (Enemy enemy : enemies) {
-            g2d.fillOval((int) enemy.pos.getX() / 7 + 20, (int) enemy.pos.getY() / 7 + 20, enemy.size / 7 , enemy.size / 7 );
+            g2d.fillOval((int) enemy.pos.getX() / 7 + 20, (int) enemy.pos.getY() / 7 + 20, enemy.size, enemy.size);
         }  
         // beamを描画
         g2d.setColor(Color.GRAY);
@@ -221,14 +227,6 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
         // プレイヤーを描画
         g2d.setColor(Color.BLUE);
         g2d.fillOval((int) player.getPos().getX() / 7 + 20, (int) player.getPos().getY() / 7 + 20, 4, 4);
-
-        // 壁1を描画
-        g2d.setColor(Color.WHITE);
-        g2d.setStroke(new BasicStroke(1));
-        for (Ray wall : walls1) {
-            g2d.drawLine((int) wall.getBegin().getX() / 7 + 20, (int) wall.getBegin().getY() / 7 + 20,
-                         (int) wall.getEnd(1).getX() / 7 + 20, (int) wall.getEnd(1).getY() / 7 + 20);
-        }
 
         // 建物を描画
         for(Building building : buildings) {
@@ -251,8 +249,13 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
         // 弾を描画
         g2d.setColor(Color.YELLOW);
         for (Bullet bullet : bullets) {
-            g2d.fillRect((int) bullet.pos.getX() / 7 + 20, (int) bullet.pos.getY() / 7 + 20, bullet.width / 7, bullet.height / 7);
+            g2d.fillRect((int) bullet.pos.getX() / 7 + 20, (int) bullet.pos.getY() / 7 + 20, bullet.width, bullet.height);
         }
+
+        // スコアを表示
+        g2d.setFont(new Font("Serif", Font.BOLD, 20));
+        g2d.setColor(Color.BLACK);
+        g2d.drawString("Score : " + player.getScore(), WIDTH - 100, 30);
     }
 
     @Override
@@ -261,7 +264,7 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
         Iterator<Bullet> bulletIterator = bullets.iterator();
         while (bulletIterator.hasNext()) {
             Bullet bullet = bulletIterator.next();
-            bullet.pos = bullet.pos.add((new Vec(Math.cos(bullet.angle), Math.sin(bullet.angle))).mult(3));
+            bullet.pos = bullet.pos.add((new Vec(Math.cos(bullet.angle), Math.sin(bullet.angle))).mult(5));
             if (bullet.pos.getY() < 0 || bullet.pos.getY() > HEIGHT || bullet.pos.getX() < 0 || bullet.pos.getX() > WIDTH) {
                 bulletIterator.remove();
             }
@@ -280,6 +283,7 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
 
                     if(enemy.HP == 0) {
                         enemyIterator.remove();
+                        player.addScore();
                     }
                     break;
                 }
@@ -491,8 +495,8 @@ class Vec {
 class Bullet {
     Vec pos;
     double angle;
-    int width = 10;
-    int height = 20;
+    int width = 2;
+    int height = 3;
 
     public Bullet(Vec pos, double angle) {
         this.pos = pos;
@@ -503,10 +507,12 @@ class Bullet {
 class Player {
     private Vec pos;
     private double angle;
+    private int score;
 
     Player(Vec pos, double angle) {
         this.pos = pos;
         this.angle = angle;
+        this.score = 0;
     }
 
     Vec getPos() {
@@ -524,11 +530,17 @@ class Player {
     void setAngle(double angle) {
         this.angle = angle;
     }
+    void addScore(){
+        this.score++;
+    }
+    int getScore(){
+        return this.score;
+    }
 }
 // 敵のクラス
 class Enemy {
     Vec pos;
-    int size = 30;
+    int size = 3;
     int HP = 2;
 
     public Enemy(Vec pos) {
