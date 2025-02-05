@@ -26,12 +26,12 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
     // 弾と敵のリスト
     private ArrayList<Bullet> bullets = new ArrayList<>();
     private ArrayList<Enemy> enemies = new ArrayList<>();
-    private ArrayList<Ray> walls1 = new ArrayList<>();
     private ArrayList<Ray> fieldWalls = new ArrayList<>();
     private ArrayList<Boss> bosses = new ArrayList<>();
 
     private ArrayList<Building> buildings = new ArrayList<>();
     private Image enemyImage;
+    private Image bossImage;
     private Image gun;
     // private Image buckGraund;
     private static final int TOTAL_BACKGROUNDS = 36;
@@ -44,8 +44,9 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
     public ShootingGame() {
         this.setPreferredSize(new Dimension(WIDTH, HEIGHT));
 
-        enemyImage = new ImageIcon(getClass().getResource("/creeper1.png")).getImage();
-        gun = new ImageIcon(getClass().getResource("/gun2.png")).getImage();
+        enemyImage = new ImageIcon(getClass().getResource("/risaju.png")).getImage();
+        bossImage = new ImageIcon(getClass().getResource("/risaju.png")).getImage();
+        gun = new ImageIcon(getClass().getResource("/gun.png")).getImage();
         // buckGraund = new ImageIcon(getClass().getResource("/Default_superflat_world.png")).getImage();
 
         for (int i = 0; i < TOTAL_BACKGROUNDS; i++) {
@@ -145,9 +146,29 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
     }
 
     private void spawnEnemies() {
-        for (int i = 0; i < 10; i++) {
-            enemies.add(new Enemy(new Vec(Math.random() * FIELD_WIDTH, Math.random() * FIELD_HEIGHT / 2)));
+        for (int i = 0; i < 10; ) {
+            Vec NewEnemiePos = new Vec(Math.random() * FIELD_WIDTH, Math.random() * FIELD_HEIGHT / 2);
+            if(Map[(int)NewEnemiePos.getX()][(int)NewEnemiePos.getY()] == 0){
+                enemies.add(new Enemy(NewEnemiePos));
+                i++;
+            }
         }
+    }
+
+    private void spawnBoss() {
+        do{
+            Vec NewBossPos = new Vec(Math.random() * FIELD_WIDTH, Math.random() * FIELD_HEIGHT / 2);
+            if(Map[(int)NewBossPos.getX()][(int)NewBossPos.getY()] == 0){
+                bosses.add(new Boss(NewBossPos));
+            }
+        }while(bosses.isEmpty()); 
+    }
+
+    private boolean getCanMove(Vec pos){
+        if(Map[(int)pos.getX()][(int)pos.getY()] == 0){
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -155,16 +176,6 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
 
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
-        
-        // 背景の上半分を水色に塗る
-        // g2d.setColor(new Color(135, 206, 235)); // 水色 (スカイブルー)
-        // g2d.fillRect(0, 0, WIDTH, HEIGHT / 2);
-        
-        // 背景の下半分を緑色に塗る
-        // g2d.setColor(new Color(34, 139, 34)); // 緑色 (草原のような色)
-        // g2d.fillRect(0, HEIGHT / 2, WIDTH, HEIGHT / 2);
-
-        // g2d.drawImage(buckGraund, 0, -5, WIDTH, HEIGHT+5, null);
         
         int index = (int) ((player.getAngle() / (2 * Math.PI)) * TOTAL_BACKGROUNDS) % TOTAL_BACKGROUNDS;
         if (index < 0) {
@@ -179,20 +190,33 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
 
         for (Enemy enemy : enemies) {
 
-            if(enemy.getCanMoveEnemy() == true) {
+            Vec direction = new Vec(player.getPos().getX() - enemy.pos.getX(), player.getPos().getY() - enemy.pos.getY());
+            double len = direction.mag();
+            Vec new_pos = enemy.pos.add((new Vec(direction.getX() / (len * 2), direction.getY() / (len * 2))));
+            if(getCanMove(new_pos)) {
 
-                // g2d.fillOval((int) enemy.pos.getX() / 7 + 20, (int) enemy.pos.getY() / 7 + 20, enemy.size / 7 , enemy.size / 7 );
-                // enemy.pos = enemy.pos.add(new Vec(0, 1)); // 敵を下に動かす
                 if(enemy.pos.sub(player.getPos()).mag() < 15){
                     continue;
                 }
                 if(enemy.pos.sub(player.getPos()).mag() < 100){
-                    Vec direction = new Vec(player.getPos().getX() - enemy.pos.getX(), player.getPos().getY() - enemy.pos.getY());
-                    double len = direction.mag();
-                    enemy.pos = enemy.pos.add((new Vec(direction.getX() / (len * 2), direction.getY() / (len * 2)))); // 敵を下に動かす
+                    enemy.pos = new_pos;
                 }
             }
+        }
 
+        // bossを描画
+        for (Boss boss : bosses) {
+            Vec direction = new Vec(player.getPos().getX() - boss.pos.getX(), player.getPos().getY() - boss.pos.getY());
+            double len = direction.mag();
+            Vec new_pos = boss.pos.add((new Vec(direction.getX() / (len * 2), direction.getY() / (len * 2))));
+            if(getCanMove(new_pos)){
+                if(boss.pos.sub(player.getPos()).mag() < 15){
+                    continue;
+                }
+                if(boss.pos.sub(player.getPos()).mag() < 100){
+                    boss.pos =  new_pos;
+                }
+            }
         }
 
         double fov = Math.PI / 2;
@@ -255,6 +279,26 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
         g2d.setFont(new Font("Serif", Font.BOLD, 20));
         g2d.setColor(Color.BLACK);
         g2d.drawString("Score : " + player.getScore(), WIDTH - 100, 30);
+
+        // BossのHP表示
+        if(!bosses.isEmpty()){
+            for(Boss boss : bosses){
+                g2d.setFont(new Font("Serif", Font.BOLD, 20));
+                g2d.setColor(Color.BLACK);
+                g2d.drawString("ボスのHP : " + boss.getHP(), WIDTH - 650, 30);
+                int x[] = {WIDTH - 500, WIDTH - 500, WIDTH - 200, WIDTH - 200};
+                int y[] = {15         ,          35,          35,          15};
+                g2d.drawPolygon(x, y, 4);
+                g2d.setColor(Color.YELLOW);
+                double ratio = (double)boss.getHP() / boss.getMAXHP();
+                double len = x[2] - x[0];
+                int new_x = (int)(len * ratio + x[0]);
+                x[2] = new_x; x[3] = new_x;
+                y[0]++; y[1]--; y[2]--; y[3]++;
+                x[0]++; x[1]++; x[2]--; x[3]--;
+                g2d.fillPolygon(x, y, 4);
+            }
+        }
     }
 
     @Override
@@ -273,6 +317,8 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
             // }
         }
 
+    
+
         // 敵と弾の衝突判定
         Iterator<Enemy> enemyIterator = enemies.iterator();
         while (enemyIterator.hasNext()) {
@@ -287,22 +333,13 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
                     if(enemy.HP == 0) {
                         enemyIterator.remove();
                         player.addScore();
+
+                        if(player.getScore() == 3){
+                            spawnBoss();
+                        }
                     }
                     break;
                 }
-            }
-        }
-
-        // 敵と建物の衝突判定
-        for(Enemy enemy : enemies) {
-
-            int x = (int)enemy.pos.getX();
-            int y = (int)enemy.pos.getY();
-
-            if(Map[x][y] == 1) {
-                enemy.setCanMoveEnemy(false);
-            } else {
-                enemy.setCanMoveEnemy(true);
             }
         }
 
@@ -311,17 +348,7 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
     }
 
     private void getWallhits(ArrayList<WallHit> wallHits, Player player, double angle, double fov, ArrayList<Enemy> enemies, ArrayList<Bullet> bullets){
-        for (Ray wall : walls1) {
-            Ray beam = new Ray(player.getPos(), new Vec(Math.cos(angle), Math.sin(angle)));
-            Vec hit = beam.intersection(wall);
-            if (hit != null) {
-                double wallDist = hit.sub(player.getPos()).mag();
-                double wallPerpDist = wallDist * Math.cos(angle - player.getAngle()); // 修正点
-                // int brightness = (int) Math.max(0, Math.min(255, 255 - wallPerpDist * 10));
-                // wallHits.add(new WallHit(hit, wallPerpDist, new Color(brightness, brightness, brightness), 1));
-                wallHits.add(new WallHit(hit, wallPerpDist, angle, Color.WHITE, 1));
-            }
-        }
+
         for (Enemy enemy : enemies) {
             Ray beam = new Ray(player.getPos(), new Vec(Math.cos(angle), Math.sin(angle)));
             Ray wall = new Ray(enemy.pos, new Vec(1 * Math.cos(player.getAngle()), 1 * Math.sin(player.getAngle())));
@@ -587,19 +614,12 @@ class Enemy {
     public int getHP() {
         return HP;
     }
-
-    public void setCanMoveEnemy(boolean canMoveEnemy) {
-        this.canMoveEnemy = canMoveEnemy;
-    }
-
-    public boolean getCanMoveEnemy() {
-        return canMoveEnemy;
-    }
 }
 class Boss {
     Vec pos;
     int size = 40;
     int HP = 5;
+    private final int MAX_HP = 5;
 
     public Boss(Vec pos) {
         this.pos = pos;
@@ -607,6 +627,10 @@ class Boss {
 
     public int getHP() {
         return HP;
+    }
+
+    int getMAXHP(){
+        return MAX_HP;
     }
 }
 
