@@ -182,17 +182,22 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
 
         // 敵を描画
         for (Enemy enemy : enemies) {
-            // g2d.fillOval((int) enemy.pos.getX() / 7 + 20, (int) enemy.pos.getY() / 7 + 20, enemy.size / 7 , enemy.size / 7 );
-            // enemy.pos = enemy.pos.add(new Vec(0, 1)); // 敵を下に動かす
-            if(enemy.pos.sub(player.getPos()).mag() < 15){
-                continue;
+
+            if(enemy.getCanMoveEnemy() == true) {
+
+                // g2d.fillOval((int) enemy.pos.getX() / 7 + 20, (int) enemy.pos.getY() / 7 + 20, enemy.size / 7 , enemy.size / 7 );
+                // enemy.pos = enemy.pos.add(new Vec(0, 1)); // 敵を下に動かす
+                if(enemy.pos.sub(player.getPos()).mag() < 15){
+                    continue;
+                }
+                if(enemy.pos.sub(player.getPos()).mag() < 100){
+                    Vec direction = new Vec(player.getPos().getX() - enemy.pos.getX(), player.getPos().getY() - enemy.pos.getY());
+                    double len = direction.mag();
+                    enemy.pos = enemy.pos.add((new Vec(direction.getX() / (len * 2), direction.getY() / (len * 2)))); // 敵を下に動かす
+                }
             }
-            if(enemy.pos.sub(player.getPos()).mag() < 100){
-                Vec direction = new Vec(player.getPos().getX() - enemy.pos.getX(), player.getPos().getY() - enemy.pos.getY());
-                double len = direction.mag();
-                enemy.pos = enemy.pos.add((new Vec(direction.getX() / (len * 2), direction.getY() / (len * 2)))); // 敵を下に動かす
-            }
-        }  
+
+        } 
         // bossを描画
         for (Boss boss : bosses) {
             // g2d.fillOval((int) boss.pos.getX() / 7 + 20, (int) boss.pos.getY() / 7 + 20, boss.size / 7 , boss.size / 7 );
@@ -343,6 +348,19 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
                 }
             }
         }
+
+        for(Enemy enemy : enemies) {
+
+            int x = (int)enemy.pos.getX();
+            int y = (int)enemy.pos.getY();
+
+            if(Map[x][y] == 1) {
+                enemy.setCanMoveEnemy(false);
+            } else {
+                enemy.setCanMoveEnemy(true);
+            }
+        }
+
         // 再描画
         repaint();
     }
@@ -614,6 +632,7 @@ class Enemy {
     Vec pos;
     int size = 3;
     int HP = 2;
+    Boolean canMoveEnemy = true;
 
     public Enemy(Vec pos) {
         this.pos = pos;
@@ -621,6 +640,14 @@ class Enemy {
 
     public int getHP() {
         return HP;
+    }
+
+    public void setCanMoveEnemy(boolean canMoveEnemy) {
+        this.canMoveEnemy = canMoveEnemy;
+    }
+
+    public boolean getCanMoveEnemy() {
+        return canMoveEnemy;
     }
 }
 class Boss {
