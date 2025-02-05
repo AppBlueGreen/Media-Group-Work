@@ -131,6 +131,10 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
         }
     }
 
+    private void spawnBoss() {
+        bosses.add(new Boss(new Vec(Math.random() * FIELD_WIDTH, Math.random() * FIELD_HEIGHT / 2)));
+    }
+
     @Override
     protected void paintComponent(Graphics g) {
 
@@ -191,7 +195,13 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
         g2d.setColor(Color.RED);
         for (Enemy enemy : enemies) {
             g2d.fillOval((int) enemy.pos.getX() / 7 + 20, (int) enemy.pos.getY() / 7 + 20, enemy.size, enemy.size);
-        }  
+        }
+
+        g2d.setColor(Color.BLACK);
+        for (Boss boss : bosses) {
+            g2d.fillOval((int) boss.pos.getX() / 7 + 20, (int) boss.pos.getY() / 7 + 20, boss.size, boss.size);
+        }
+
         // beamを描画
         g2d.setColor(Color.GRAY);
         g2d.setStroke(new BasicStroke(1));
@@ -258,6 +268,10 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
                     if(enemy.HP == 0) {
                         enemyIterator.remove();
                         player.addScore();
+
+                        if(player.getScore() == 3){
+                            spawnBoss();
+                        }
                     }
                     break;
                 }
@@ -527,7 +541,7 @@ class Enemy {
 }
 class Boss {
     Vec pos;
-    int size = 40;
+    int size = 4;
     int HP = 5;
 
     public Boss(Vec pos) {
