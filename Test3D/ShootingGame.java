@@ -11,13 +11,15 @@ import java.util.Iterator;
 
 public class ShootingGame extends JPanel implements ActionListener, KeyListener {
     // ウィンドウのサイズ
-    private static final int WIDTH = 600;
+    private static final int WIDTH = 800;
     private static final int HEIGHT = 600;
+    private static final int FIELD_WIDTH = 600;
+    private static final int FIELD_HEIGHT = 600;
 
     // プレイヤーの位置とサイズ
     private Player player;
     // private Vec playerPos = new Vec(WIDTH / 2, HEIGHT - 40);
-    private Vec playerPos = new Vec(WIDTH,40);
+    private Vec playerPos = new Vec(FIELD_WIDTH,40);
 
     // 弾と敵のリスト
     private ArrayList<Bullet> bullets = new ArrayList<>();
@@ -107,12 +109,12 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
 
 
         
-        fieldWalls.add(new Ray(new Vec(0, 0), new Vec(WIDTH, 0).sub(new Vec(0, 0))));
-        fieldWalls.add(new Ray(new Vec(0, 0), new Vec(0, HEIGHT).sub(new Vec(0, 0))));
-        fieldWalls.add(new Ray(new Vec(WIDTH, HEIGHT), new Vec(WIDTH, 0).sub(new Vec(WIDTH, HEIGHT))));
-        fieldWalls.add(new Ray(new Vec(WIDTH, HEIGHT), new Vec(0, HEIGHT).sub(new Vec(WIDTH, HEIGHT))));
+        fieldWalls.add(new Ray(new Vec(0, 0), new Vec(FIELD_WIDTH, 0).sub(new Vec(0, 0))));
+        fieldWalls.add(new Ray(new Vec(0, 0), new Vec(0, FIELD_HEIGHT).sub(new Vec(0, 0))));
+        fieldWalls.add(new Ray(new Vec(FIELD_WIDTH, FIELD_HEIGHT), new Vec(FIELD_WIDTH, 0).sub(new Vec(FIELD_WIDTH, FIELD_HEIGHT))));
+        fieldWalls.add(new Ray(new Vec(FIELD_WIDTH, FIELD_HEIGHT), new Vec(0, FIELD_HEIGHT).sub(new Vec(FIELD_WIDTH, FIELD_HEIGHT))));
 
-        this.player = new Player(playerPos, -Math.PI / 2);
+        this.player = new Player(playerPos, -Math.PI);
         // タイマーとイベントリスナーの設定
         timer = new Timer(15, this);
         timer.start();
@@ -125,7 +127,7 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
 
     private void spawnEnemies() {
         for (int i = 0; i < 10; i++) {
-            enemies.add(new Enemy(new Vec(Math.random() * WIDTH, Math.random() * HEIGHT / 2)));
+            enemies.add(new Enemy(new Vec(Math.random() * FIELD_WIDTH, Math.random() * FIELD_HEIGHT / 2)));
         }
     }
 
@@ -156,7 +158,7 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
         // 敵を描画
         g2d.setColor(Color.RED);
         for (Enemy enemy : enemies) {
-            g2d.fillOval((int) enemy.pos.getX() / 7 + 20, (int) enemy.pos.getY() / 7 + 20, enemy.size / 7 , enemy.size / 7 );
+            // g2d.fillOval((int) enemy.pos.getX() / 7 + 20, (int) enemy.pos.getY() / 7 + 20, enemy.size / 7 , enemy.size / 7 );
             // enemy.pos = enemy.pos.add(new Vec(0, 1)); // 敵を下に動かす
             if(enemy.pos.sub(player.getPos()).mag() < 15){
                 continue;
@@ -175,6 +177,15 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
         draw3DWalls(g2d, wallHits, player, fov, enemies, bullets, buildings);
         g2d.drawImage(gun, (WIDTH / 2) + 120, (HEIGHT / 2) - 250, 600, 600, null);
 
+        
+
+        g2d.setColor(new Color(34, 139, 34)); // 緑
+        g2d.fillRect(20, 20, FIELD_WIDTH / 7, FIELD_HEIGHT / 7);
+
+        g2d.setColor(Color.RED);
+        for (Enemy enemy : enemies) {
+            g2d.fillOval((int) enemy.pos.getX() / 7 + 20, (int) enemy.pos.getY() / 7 + 20, enemy.size / 7 , enemy.size / 7 );
+        }  
         // beamを描画
         g2d.setColor(Color.GRAY);
         g2d.setStroke(new BasicStroke(1));
