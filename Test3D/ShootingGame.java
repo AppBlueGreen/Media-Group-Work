@@ -58,12 +58,6 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
             }
         }
 
-        // 白い壁の追加
-        walls1.add(new Ray(new Vec(300, 500), new Vec(300, 525).sub(new Vec(300, 500))));
-        walls1.add(new Ray(new Vec(300, 500), new Vec(325, 500).sub(new Vec(300, 500))));
-        walls1.add(new Ray(new Vec(325, 525), new Vec(300, 525).sub(new Vec(325, 525))));
-        walls1.add(new Ray(new Vec(325, 525), new Vec(325, 500).sub(new Vec(325, 525))));
-
         // add buildings
         buildings.add(new Building(new Vec(400, 30), 60, 150, 4, Color.RED)); // 1  学生寮
 
@@ -122,52 +116,27 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
         this.addKeyListener(this);
 
         for(int i = 0; i < WIDTH; i++)
-        for(int j = 0; j < HEIGHT; j++)
-            Map[i][j] = 0;
-
-        for(Building building : buildings) {
-
-            ArrayList<Ray> lines = building.lines;
-            for(Ray line : lines) {
-
-                Vec vec = line.getBegin();
-                double width = building.getWidth();
-                double height = building.getHeight();
-
-                for(int x = (int)vec.getX(); x < width; x++) {
-
-                    for(int y = (int)vec.getY(); y < height; y++) {
-                        Map[x][y] = 1;
-                        System.out.printf("%d", Map[x][y]);
-                        System.out.println("読み込まれています");
-                    }
-                    System.out.printf("\n");
-                }
-            }
-        }
-
-        for(int i = 0; i < WIDTH; i++)
             for(int j = 0; j < HEIGHT; j++)
                 Map[i][j] = 0;
 
         for(Building building : buildings) {
 
-            ArrayList<Ray> lines = building.lines;
-            for(Ray line : lines) {
+            int x0 = (int)building.pos.getX();
+            int y0 = (int)building.pos.getY();
+            int width = (int)building.getWidth();
+            int vertical = (int)building.getVertical();
 
-                Vec vec = line.getBegin();
-                double width = building.getWidth();
-                double height = building.getHeight();
-
-                for(int x = (int)vec.getX(); x < width; x++) {
-
-                    for(int y = (int)vec.getY(); y < height; y++) {
-                        Map[x][y] = 1;
-                        System.out.printf("%d", Map[x][y]);
-                    }
-                    System.out.printf("\n");
-                }
+            for(int j = y0; j < y0 + vertical; j++) {
+                for(int i = x0; i < x0 + width; i++)
+                    Map[i][j] = 1;
             }
+        }
+
+        for(int j = 0; j < HEIGHT; j+= 5) {
+            for(int i = 0; i < WIDTH; i+= 5) {
+                System.out.printf("%d", Map[i][j]);
+            }
+            System.out.println();
         }
 
 
@@ -207,18 +176,24 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
 
         // 敵を描画
         g2d.setColor(Color.RED);
+
         for (Enemy enemy : enemies) {
-            // g2d.fillOval((int) enemy.pos.getX() / 7 + 20, (int) enemy.pos.getY() / 7 + 20, enemy.size / 7 , enemy.size / 7 );
-            // enemy.pos = enemy.pos.add(new Vec(0, 1)); // 敵を下に動かす
-            if(enemy.pos.sub(player.getPos()).mag() < 15){
-                continue;
+
+            if(enemy.getCanMoveEnemy() == true) {
+
+                // g2d.fillOval((int) enemy.pos.getX() / 7 + 20, (int) enemy.pos.getY() / 7 + 20, enemy.size / 7 , enemy.size / 7 );
+                // enemy.pos = enemy.pos.add(new Vec(0, 1)); // 敵を下に動かす
+                if(enemy.pos.sub(player.getPos()).mag() < 15){
+                    continue;
+                }
+                if(enemy.pos.sub(player.getPos()).mag() < 100){
+                    Vec direction = new Vec(player.getPos().getX() - enemy.pos.getX(), player.getPos().getY() - enemy.pos.getY());
+                    double len = direction.mag();
+                    enemy.pos = enemy.pos.add((new Vec(direction.getX() / (len * 2), direction.getY() / (len * 2)))); // 敵を下に動かす
+                }
             }
-            if(enemy.pos.sub(player.getPos()).mag() < 100){
-                Vec direction = new Vec(player.getPos().getX() - enemy.pos.getX(), player.getPos().getY() - enemy.pos.getY());
-                double len = direction.mag();
-                enemy.pos = enemy.pos.add((new Vec(direction.getX() / (len * 2), direction.getY() / (len * 2)))); // 敵を下に動かす
-            }
-        }  
+
+        }
 
         double fov = Math.PI / 2;
         double beamStep = fov / 5500;
@@ -289,9 +264,13 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
         while (bulletIterator.hasNext()) {
             Bullet bullet = bulletIterator.next();
             bullet.pos = bullet.pos.add((new Vec(Math.cos(bullet.angle), Math.sin(bullet.angle))).mult(5));
-            if (bullet.pos.getY() < 0 || bullet.pos.getY() > HEIGHT || bullet.pos.getX() < 0 || bullet.pos.getX() > WIDTH) {
+            if (bullet.pos.getY() < 0 || bullet.pos.getY() > FIELD_HEIGHT || bullet.pos.getX() < 0 || bullet.pos.getX() > FIELD_WIDTH || Map[(int)bullet.pos.getX()][(int)bullet.pos.getY()] == 1) {
                 bulletIterator.remove();
             }
+
+            // if(Map[(int)bullet.pos.getX()][(int)bullet.pos.getY()] == 1) {
+            //     bulletIterator.remove();
+            // }
         }
 
         // 敵と弾の衝突判定
@@ -311,6 +290,19 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
                     }
                     break;
                 }
+            }
+        }
+
+        // 敵と建物の衝突判定
+        for(Enemy enemy : enemies) {
+
+            int x = (int)enemy.pos.getX();
+            int y = (int)enemy.pos.getY();
+
+            if(Map[x][y] == 1) {
+                enemy.setCanMoveEnemy(false);
+            } else {
+                enemy.setCanMoveEnemy(true);
             }
         }
 
@@ -521,10 +513,19 @@ class Bullet {
     double angle;
     int width = 2;
     int height = 3;
+    boolean canMoveBullet = true;
 
     public Bullet(Vec pos, double angle) {
         this.pos = pos;
         this.angle = angle;
+    }
+
+    public void setCanMoveBullet(boolean canMoveBullet) {
+        this.canMoveBullet = canMoveBullet;
+    }
+
+    public boolean getCanMoveBullet() {
+        return canMoveBullet;
     }
 }
 
@@ -566,6 +567,7 @@ class Enemy {
     Vec pos;
     int size = 3;
     int HP = 2;
+    Boolean canMoveEnemy = true;
 
     public Enemy(Vec pos) {
         this.pos = pos;
@@ -573,6 +575,14 @@ class Enemy {
 
     public int getHP() {
         return HP;
+    }
+
+    public void setCanMoveEnemy(boolean canMoveEnemy) {
+        this.canMoveEnemy = canMoveEnemy;
+    }
+
+    public boolean getCanMoveEnemy() {
+        return canMoveEnemy;
     }
 }
 class Boss {
@@ -652,6 +662,10 @@ class Building extends Ray{
 
     public double getHeight() {
         return height;
+    }
+
+    public double getVertical() {
+        return vertical;
     }
 
     public double getWidth() {
