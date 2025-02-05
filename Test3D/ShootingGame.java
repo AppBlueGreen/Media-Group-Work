@@ -31,6 +31,7 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
 
     private ArrayList<Building> buildings = new ArrayList<>();
     private Image enemyImage;
+    private Image bossImage;
     private Image gun;
     // private Image buckGraund;
     private static final int TOTAL_BACKGROUNDS = 36;
@@ -43,8 +44,9 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
     public ShootingGame() {
         this.setPreferredSize(new Dimension(WIDTH, HEIGHT));
 
-        enemyImage = new ImageIcon(getClass().getResource("/creeper1.png")).getImage();
-        gun = new ImageIcon(getClass().getResource("/gun2.png")).getImage();
+        enemyImage = new ImageIcon(getClass().getResource("/risaju.png")).getImage();
+        bossImage = new ImageIcon(getClass().getResource("/risaju.png")).getImage();
+        gun = new ImageIcon(getClass().getResource("/gun.png")).getImage();
         // buckGraund = new ImageIcon(getClass().getResource("/Default_superflat_world.png")).getImage();
 
         for (int i = 0; i < TOTAL_BACKGROUNDS; i++) {
@@ -277,6 +279,26 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
         g2d.setFont(new Font("Serif", Font.BOLD, 20));
         g2d.setColor(Color.BLACK);
         g2d.drawString("Score : " + player.getScore(), WIDTH - 100, 30);
+
+        // BossのHP表示
+        if(!bosses.isEmpty()){
+            for(Boss boss : bosses){
+                g2d.setFont(new Font("Serif", Font.BOLD, 20));
+                g2d.setColor(Color.BLACK);
+                g2d.drawString("ボスのHP : " + boss.getHP(), WIDTH - 650, 30);
+                int x[] = {WIDTH - 500, WIDTH - 500, WIDTH - 200, WIDTH - 200};
+                int y[] = {15         ,          35,          35,          15};
+                g2d.drawPolygon(x, y, 4);
+                g2d.setColor(Color.YELLOW);
+                double ratio = (double)boss.getHP() / boss.getMAXHP();
+                double len = x[2] - x[0];
+                int new_x = (int)(len * ratio + x[0]);
+                x[2] = new_x; x[3] = new_x;
+                y[0]++; y[1]--; y[2]--; y[3]++;
+                x[0]++; x[1]++; x[2]--; x[3]--;
+                g2d.fillPolygon(x, y, 4);
+            }
+        }
     }
 
     @Override
@@ -295,6 +317,8 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
             // }
         }
 
+    
+
         // 敵と弾の衝突判定
         Iterator<Enemy> enemyIterator = enemies.iterator();
         while (enemyIterator.hasNext()) {
@@ -309,22 +333,13 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
                     if(enemy.HP == 0) {
                         enemyIterator.remove();
                         player.addScore();
+
+                        if(player.getScore() == 3){
+                            spawnBoss();
+                        }
                     }
                     break;
                 }
-            }
-        }
-
-        // 敵と建物の衝突判定
-        for(Enemy enemy : enemies) {
-
-            int x = (int)enemy.pos.getX();
-            int y = (int)enemy.pos.getY();
-
-            if(Map[x][y] == 1) {
-                enemy.setCanMoveEnemy(false);
-            } else {
-                enemy.setCanMoveEnemy(true);
             }
         }
 
@@ -599,19 +614,12 @@ class Enemy {
     public int getHP() {
         return HP;
     }
-
-    public void setCanMoveEnemy(boolean canMoveEnemy) {
-        this.canMoveEnemy = canMoveEnemy;
-    }
-
-    public boolean getCanMoveEnemy() {
-        return canMoveEnemy;
-    }
 }
 class Boss {
     Vec pos;
     int size = 40;
     int HP = 5;
+    private final int MAX_HP = 5;
 
     public Boss(Vec pos) {
         this.pos = pos;
@@ -619,6 +627,10 @@ class Boss {
 
     public int getHP() {
         return HP;
+    }
+
+    int getMAXHP(){
+        return MAX_HP;
     }
 }
 
