@@ -139,6 +139,7 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
                     for(int y = (int)vec.getY(); y < height; y++) {
                         Map[x][y] = 1;
                         System.out.printf("%d", Map[x][y]);
+                        System.out.println("読み込まれています");
                     }
                     System.out.printf("\n");
                 }
