@@ -1,5 +1,8 @@
 package Test3D;
 
+import hoge.Ray;
+import hoge.Vec;
+
 class Vec {
     private double x;
     private double y;

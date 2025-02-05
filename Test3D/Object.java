@@ -1,5 +1,7 @@
 package Test3D;
 
+import hoge.Vec;
+
 // 弾のクラス
 class Bullet {
     Vec pos;

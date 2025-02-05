@@ -16,6 +16,8 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
     private static final int FIELD_WIDTH = 600;
     private static final int FIELD_HEIGHT = 600;
 
+    int Map[][] = new int[WIDTH][HEIGHT];
+
     // プレイヤーの位置とサイズ
     private Player player;
     // private Vec playerPos = new Vec(WIDTH / 2, HEIGHT - 40);
@@ -120,6 +122,30 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
         timer.start();
         this.setFocusable(true);
         this.addKeyListener(this);
+
+        for(int i = 0; i < WIDTH; i++)
+        for(int j = 0; j < HEIGHT; j++)
+            Map[i][j] = 0;
+
+        for(Building building : buildings) {
+
+            ArrayList<Ray> lines = building.lines;
+            for(Ray line : lines) {
+
+                Vec vec = line.getBegin();
+                double width = building.getWidth();
+                double height = building.getHeight();
+
+                for(int x = (int)vec.getX(); x < width; x++) {
+
+                    for(int y = (int)vec.getY(); y < height; y++) {
+                        Map[x][y] = 1;
+                        System.out.printf("%d", Map[x][y]);
+                    }
+                    System.out.printf("\n");
+                }
+            }
+        }
 
         // 敵を生成
         spawnEnemies();
@@ -590,6 +616,10 @@ class Building extends Ray{
 
     public double getHeight() {
         return height;
+    }
+
+    public double getWidth() {
+        return width;
     }
 
     public void draw(Graphics g) { }
