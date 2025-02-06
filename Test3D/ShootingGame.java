@@ -21,7 +21,7 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
     // プレイヤーの位置とサイズ
     private Player player;
     // private Vec playerPos = new Vec(WIDTH / 2, HEIGHT - 40);
-    private Vec playerPos = new Vec(FIELD_WIDTH,40);
+    private Vec playerPos = new Vec(590,130);
 
     // 弾と敵のリスト
     private ArrayList<Bullet> bullets = new ArrayList<>();
@@ -70,49 +70,65 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
 
 
         // add buildings
-        buildings.add(new Building(new Vec(400, 30), 60, 150, 4, Color.RED)); // 1  学生寮
+        buildings.add(new Building(new Vec(400, 30), 60, 150, 4, new Color(0xffdead))); // 1  学生寮
 
-        buildings.add(new Building(new Vec(430, 170), 40, 20, 5, Color.BLUE)); // 2.1　体育館
-        buildings.add(new Building(new Vec(450, 150), 80, 110, 5, Color.BLUE)); // 2.2　体育館
+        buildings.add(new Building(new Vec(430, 170), 40, 20, 1, new Color(0xfaebd7))); // 2.1　体育館
+        buildings.add(new Building(new Vec(450, 150), 80, 110, 5, new Color(0xfaebd7))); // 2.2　体育館
 
-        buildings.add(new Building(new Vec(510, 250), 40, 70, 2, Color.GREEN)); // 3　第２体育館
+        buildings.add(new Building(new Vec(505, 260), 10, 5, 1, new Color(0xcd853f))); // 3　第２体育館1 正面
+        buildings.add(new Building(new Vec(510, 250), 40, 70, 3, new Color(0xcd853f))); // 3　第２体育館2 1,2F
+        buildings.add(new Building(new Vec(510, 255), 30, 5, 1, new Color(0xfaf0e6))); // 3　第２体育館3 1F
 
-        buildings.add(new Building(new Vec(410, 290), 60, 40, 5, Color.GRAY)); // 4　西５号館
-        buildings.add(new Building(new Vec(450, 290), 30, 40, 5, Color.GRAY)); // 5　西５号館
+        // buildings.add(new Building(new Vec(410, 290), 20, 20, 1, new Color(0xf5f5f5))); // 4　西５号館
+        buildings.add(new Building(new Vec(430, 290), 20, 60, 5, new Color(0xdcdcdc))); // 5　西５号館
+        buildings.add(new Building(new Vec(410, 310), 10, 80, 5, new Color(0xdcdcdc))); // 5　西５号館
+        buildings.add(new Building(new Vec(410, 320), 30, 40, 5, new Color(0xdcdcdc))); // 5　西５号館
 
-        buildings.add(new Building(new Vec(420, 370), 30, 40, 1, Color.RED)); // 6　西食堂
-        buildings.add(new Building(new Vec(460, 350), 50, 30, 1, Color.RED)); // 7　西食堂
+        buildings.add(new Building(new Vec(420, 370), 30, 40, 1, new Color(0xffebcd))); // 6　西食堂
+        buildings.add(new Building(new Vec(460, 350), 50, 30, 1, new Color(0xffebcd))); // 7　西食堂
 
-        buildings.add(new Building(new Vec(380, 440), 40, 90, 1, Color.BLUE)); // 8　教育用計算機室
+        buildings.add(new Building(new Vec(380, 440), 40, 90, 1, new Color(0xd3d3d3))); // 8　教育用計算機室
 
-        buildings.add(new Building(new Vec(490, 420), 60, 20, 10, Color.GREEN)); // 9　情報システム学研究科棟
-        buildings.add(new Building(new Vec(510, 330), 150, 50, 10, Color.GREEN)); // 10　情報システム学研究科棟
+        buildings.add(new Building(new Vec(490, 420), 60, 20, 10, new Color(0xfffafa))); // 9　情報システム学研究科棟
+        buildings.add(new Building(new Vec(510, 330), 150, 50, 10, new Color(0xf8f8ff))); // 10　情報システム学研究科棟
 
-        buildings.add(new Building(new Vec(110, 170), 90, 50, 10, Color.RED)); // 11　ピクトラボのところ
+        buildings.add(new Building(new Vec(110, 170), 90, 50, 10, new Color(0xfaf0e6))); // 11　ピクトラボのところ
 
-        buildings.add(new Building(new Vec(200, 160), 10, 40, 10, Color.BLUE)); // 12　西７号館
-        buildings.add(new Building(new Vec(180, 170), 40, 100, 10, Color.BLUE)); // 13　西７号館
+        buildings.add(new Building(new Vec(200, 160), 10, 40, 10, new Color(0xf8f8ff))); // 12　西７号館
+        buildings.add(new Building(new Vec(180, 170), 40, 100, 10, new Color(0xf8f8ff))); // 13　西７号館
 
-        buildings.add(new Building(new Vec(300, 170), 40, 60, 10, Color.GREEN)); // 14　西６号館
+        buildings.add(new Building(new Vec(300, 170), 40, 60, 10, new Color(0xfffafa))); // 14　西６号館
 
-        buildings.add(new Building(new Vec(110, 300), 40, 70, 10, Color.GRAY)); // 15　西４号館
+        buildings.add(new Building(new Vec(110, 300), 40, 70, 10, new Color(0xfffaf0))); // 15　西４号館
 
-        buildings.add(new Building(new Vec(190, 300), 40, 170, 10, Color.YELLOW)); // 16　西２号館
+        buildings.add(new Building(new Vec(190, 300), 40, 170, 10, new Color(0xffefd5))); // 16　西２号館
 
-        buildings.add(new Building(new Vec(100, 420), 50, 50, 5, Color.RED)); // 17　西３号館
-        buildings.add(new Building(new Vec(150, 420), 40, 40, 5, Color.RED)); // 18　西３号館
+        buildings.add(new Building(new Vec(100, 420), 50, 50, 5, new Color(0xffe4c4))); // 17　西３号館
+        buildings.add(new Building(new Vec(150, 420), 40, 40, 5, new Color(0xffe4c4))); // 18　西３号館
 
-        buildings.add(new Building(new Vec(220, 420), 40, 100, 5, Color.BLUE)); // 19　西１号館
+        buildings.add(new Building(new Vec(220, 420), 40, 100, 5, new Color(0xfaebd7))); // 19　西１号館
 
-        buildings.add(new Building(new Vec(90, 490), 30, 50, 10, Color.GREEN)); // 20　　西９号館
-        buildings.add(new Building(new Vec(110, 520), 40, 30, 10, Color.GREEN)); // 21　西９号館
-        buildings.add(new Building(new Vec(80, 560), 40, 100, 10, Color.GREEN)); // 22　西９号館
+        buildings.add(new Building(new Vec(90, 490), 30, 50, 10, new Color(0xf8f8ff))); // 20　　西９号館
+        buildings.add(new Building(new Vec(110, 520), 40, 30, 10, new Color(0xf8f8ff))); // 21　西９号館
+        buildings.add(new Building(new Vec(80, 560), 40, 100, 10, new Color(0xf8f8ff))); // 22　西９号館
 
-        buildings.add(new Building(new Vec(210, 490), 50, 40, 1, Color.RED)); // 23　　西８号館
-        buildings.add(new Building(new Vec(250, 520), 20, 40, 1, Color.RED)); // 24　西８号館
-        buildings.add(new Building(new Vec(290, 490), 50, 50, 1, Color.RED)); // 25　西８号館
-        buildings.add(new Building(new Vec(240, 540), 10, 100, 10, Color.RED)); // 26　西８号館
-        buildings.add(new Building(new Vec(190, 550), 30, 110, 10, Color.RED)); // 27　西８号館
+        buildings.add(new Building(new Vec(210, 490), 50, 40, 1, new Color(0xffebcd))); // 23　　西８号館
+        buildings.add(new Building(new Vec(250, 520), 20, 40, 1, new Color(0xffebcd))); // 24　西８号館
+        buildings.add(new Building(new Vec(290, 490), 50, 50, 1, new Color(0xffebcd))); // 25　西８号館
+        buildings.add(new Building(new Vec(240, 540), 10, 100, 10, new Color(0xfaebd7))); // 26　西８号館
+        buildings.add(new Building(new Vec(190, 550), 30, 110, 10, new Color(0xfaebd7))); // 27　西８号館
+
+        buildings.add(new Building(new Vec(10, 80), 90, 50, 0.3, new Color(0xd3d3d3))); // 28　プール
+        buildings.add(new Building(new Vec(330, 10), 20, 30, 1, new Color(0xffdead))); // 30　建物１
+        buildings.add(new Building(new Vec(330, 100), 20, 30, 1, new Color(0xffdead))); // 31　建物２
+
+        buildings.add(new Building(new Vec(0, 0), 590, 10, 0.5, Color.GRAY)); // 32
+        buildings.add(new Building(new Vec(0, 590), 10, 330, 0.5, Color.GRAY)); // 33
+        buildings.add(new Building(new Vec(330, 490), 100, 10, 0.5, Color.GRAY)); // 34
+        buildings.add(new Building(new Vec(330, 490), 10, 260, 0.5, Color.GRAY)); // 35
+        buildings.add(new Building(new Vec(590, 150), 390, 10, 0.5, Color.GRAY)); // 36
+        buildings.add(new Building(new Vec(590, 0), 110, 10, 0.5, Color.GRAY)); // 37
+        buildings.add(new Building(new Vec(0, 0), 10, 590, 0.5, Color.GRAY)); // 38
 
 
         
