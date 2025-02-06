@@ -196,6 +196,11 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
             Vec new_pos = enemy.pos.add((new Vec(direction.getX() / (len * 2), direction.getY() / (len * 2))));
             if(getCanMove(new_pos)) {
                 if(enemy.pos.sub(player.getPos()).mag() < 15){
+                    enemy.addAttackCount();
+                    if(enemy.getAttackCount() == 20){
+                        player.subHP(1);
+                        enemy.resetAttackCount();
+                    }
                     continue;
                 }
                 if(enemy.pos.sub(player.getPos()).mag() < 100){
@@ -211,6 +216,11 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
             Vec new_pos = boss.pos.add((new Vec(direction.getX() / (len * 2), direction.getY() / (len * 2))));
             if(getCanMove(new_pos)){
                 if(boss.pos.sub(player.getPos()).mag() < 15){
+                    boss.addAttackCount();
+                    if(boss.getAttackCount() == 20){
+                        player.subHP(5);
+                        boss.resetAttackCount();
+                    }
                     continue;
                 }
                 if(boss.pos.sub(player.getPos()).mag() < 100){
@@ -316,6 +326,22 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
                 g2d.fillPolygon(x, y, 4);
             }
         }
+
+        // プレイヤーHP表示
+        g2d.setFont(new Font("Serif", Font.BOLD, 20));
+        g2d.setColor(Color.BLACK);
+        g2d.drawString("HP : " + player.getHP(), WIDTH - 650, 520);
+        int x[] = {WIDTH - 500, WIDTH - 500, WIDTH - 200, WIDTH - 200};
+        int y[] = {505        ,         525,         525,         505};
+        g2d.drawPolygon(x, y, 4);
+        g2d.setColor(Color.YELLOW);
+        double ratio = (double)player.getHP() / player.getMAXHP();
+        double len = x[2] - x[0];
+        int new_x = (int)(len * ratio + x[0]);
+        x[2] = new_x; x[3] = new_x;
+        y[0]++; y[1]--; y[2]--; y[3]++;
+        x[0]++; x[1]++; x[2]--; x[3]--;
+        g2d.fillPolygon(x, y, 4);
     }
 
     @Override
@@ -605,6 +631,8 @@ class Player {
     private Vec pos;
     private double angle;
     private int score;
+    private int MAX_HP = 50;
+    private int HP = 50;
 
     Player(Vec pos, double angle) {
         this.pos = pos;
@@ -633,12 +661,23 @@ class Player {
     int getScore(){
         return this.score;
     }
+    void subHP(int x){
+        this.HP -= x;;
+    }
+    int getHP() {
+        return HP;
+    }
+
+    int getMAXHP(){
+        return MAX_HP;
+    }
 }
 // 敵のクラス
 class Enemy {
     Vec pos;
     int size = 3;
     int HP = 2;
+    private int attackCount = 0;  
     Boolean canMoveEnemy = true;
 
     public Enemy(Vec pos) {
@@ -648,12 +687,22 @@ class Enemy {
     public int getHP() {
         return HP;
     }
+    void addAttackCount(){
+        this.attackCount++;
+    }
+    int getAttackCount(){
+        return this.attackCount;
+    }
+    void resetAttackCount(){
+        this.attackCount = 0;
+    }
 }
 class Boss {
     Vec pos;
     int size = 5;
     int HP = 5;
     private final int MAX_HP = 5;
+    private int attackCount = 0;
 
     public Boss(Vec pos) {
         this.pos = pos;
@@ -665,6 +714,15 @@ class Boss {
 
     int getMAXHP(){
         return MAX_HP;
+    }
+    void addAttackCount(){
+        this.attackCount++;
+    }
+    int getAttackCount(){
+        return this.attackCount;
+    }
+    void resetAttackCount(){
+        this.attackCount = 0;
     }
 }
 
