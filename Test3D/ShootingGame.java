@@ -152,11 +152,11 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
         }
 
         // 敵を生成
-        spawnEnemies();
+        spawnEnemies(10);
     }
 
-    private void spawnEnemies() {
-        for (int i = 0; i < 10; ) {
+    private void spawnEnemies(int num) {
+        for (int i = 0; i < num; ) {
             Vec NewEnemiePos = new Vec(Math.random() * FIELD_WIDTH, Math.random() * FIELD_HEIGHT / 2);
             if(Map[(int)NewEnemiePos.getX()][(int)NewEnemiePos.getY()] == 0){
                 enemies.add(new Enemy(NewEnemiePos));
