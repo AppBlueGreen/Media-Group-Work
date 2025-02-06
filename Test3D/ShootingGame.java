@@ -38,13 +38,15 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
     // private final Image[] backgrounds = new Image[TOTAL_BACKGROUNDS]; 
     private final BufferedImage[] backgrounds = new BufferedImage[TOTAL_BACKGROUNDS]; 
 
+    private Main main;
     // ゲームのタイマー
     private Timer timer;
     // 銃に関するタイマー
     private boolean canFiringEvent = true;
     private Timer firingTimer;
 
-    public ShootingGame() {
+    public ShootingGame(Main main) {
+        this.main = main;
         this.setPreferredSize(new Dimension(WIDTH, HEIGHT));
 
         enemyImage = new ImageIcon(getClass().getResource("/ma-rusu.png")).getImage();
@@ -408,9 +410,10 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
                         player.addScore();
                     
                         // ボスを倒した後の処理（例: 次のステージへ）
-                        if (player.getScore() >= 10) {
+                        // if (player.getScore() >= 10) {
                             // nextStage();
-                        }
+                        main.showScoreView(player.getScore());
+                        // }
                     }
                     break;
                 }
@@ -587,15 +590,15 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
     @Override
     public void keyTyped(KeyEvent e) {}
 
-    public static void main(String[] args) {
-        JFrame frame = new JFrame("Shooting Game");
-        ShootingGame gamePanel = new ShootingGame();
+    // public static void main(String[] args) {
+    //     JFrame frame = new JFrame("Shooting Game");
+    //     ShootingGame gamePanel = new ShootingGame();
 
-        frame.add(gamePanel);
-        frame.pack();
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setVisible(true);
-    }
+    //     frame.add(gamePanel);
+    //     frame.pack();
+    //     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    //     frame.setVisible(true);
+    // }
 }
 class WallHit {
     Vec hitPoint;        // 壁との交差点
