@@ -31,7 +31,9 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
 
     private ArrayList<Building> buildings = new ArrayList<>();
     private Image enemyImage;
-    private Image bossImage;
+    private Image bossImage0;
+    private Image bossImage1;
+    private Image bossImage2;
     private Image gun;
     // private Image buckGraund;
     private static final int TOTAL_BACKGROUNDS = 36;
@@ -50,7 +52,9 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
         this.setPreferredSize(new Dimension(WIDTH, HEIGHT));
 
         enemyImage = new ImageIcon(getClass().getResource("/ma-rusu.png")).getImage();
-        bossImage = new ImageIcon(getClass().getResource("/risaju.png")).getImage();
+        bossImage0 = new ImageIcon(getClass().getResource("/risaju.png")).getImage();
+        bossImage1 = new ImageIcon(getClass().getResource("/risaju2.png")).getImage();
+        bossImage2 = new ImageIcon(getClass().getResource("/risaju1.png")).getImage();
         gun = new ImageIcon(getClass().getResource("/gun.png")).getImage();
         // buckGraund = new ImageIcon(getClass().getResource("/Default_superflat_world.png")).getImage();
 
@@ -186,16 +190,6 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
         
-        // 背景の上半分を水色に塗る
-        // g2d.setColor(new Color(135, 206, 235)); // 水色 (スカイブルー)
-        // g2d.fillRect(0, 0, WIDTH, HEIGHT / 2);
-        
-        // 背景の下半分を緑色に塗る
-        // g2d.setColor(new Color(34, 139, 34)); // 緑色 (草原のような色)
-        // g2d.fillRect(0, HEIGHT / 2, WIDTH, HEIGHT / 2);
-
-        // g2d.drawImage(buckGraund, 0, -5, WIDTH, HEIGHT+5, null);
-        
         int index = (int) ((player.getAngle() / (2 * Math.PI)) * TOTAL_BACKGROUNDS) % TOTAL_BACKGROUNDS;
         if (index < 0) {
             index += TOTAL_BACKGROUNDS; // 負の角度に対応
@@ -229,12 +223,19 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
             Vec direction = new Vec(player.getPos().getX() - boss.pos.getX(), player.getPos().getY() - boss.pos.getY());
             double len = direction.mag();
             Vec new_pos = boss.pos.add((new Vec(direction.getX() / (len * 2), direction.getY() / (len * 2))));
+            boss.setMotion(0);
             if(getCanMove(new_pos)){
                 if(boss.pos.sub(player.getPos()).mag() < 15){
                     boss.addAttackCount();
                     if(boss.getAttackCount() == 20){
                         player.subHP(5);
                         boss.resetAttackCount();
+                    }
+                    if(10 <= boss.getAttackCount() && boss.getAttackCount() < 15){
+                        boss.setMotion(1);
+                    }
+                    if(15 <= boss.getAttackCount() && boss.getAttackCount() < 20){
+                        boss.setMotion(2);
                     }
                     continue;
                 }
@@ -386,7 +387,7 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
                         enemyIterator.remove();
                         player.addScore();
 
-                        if(player.getScore() == 3){
+                        if(player.getScore() == 1){
                             spawnBoss();
                         }
                     }
@@ -522,10 +523,20 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
             if(wallHit.wallNumber == 5){
                 int enemyHeight = (int) Math.min(HEIGHT, 3000 / wallHit.distance);
                 int enemyWidth = enemyHeight; // 正方形と仮定
-    
                 int screenX = (int) (getWidth() / 2 + (wallHit.angle - player.getAngle()) * getWidth() / fov - enemyWidth / 2);
                 int screenY = screenCenterY - enemyHeight / 2;
-                g2d.drawImage(bossImage, screenX, screenY, enemyWidth, enemyHeight, null);
+    
+                for(Boss boss: bosses){
+                    if(boss.getMotion() == 0){
+                        g2d.drawImage(bossImage0, screenX, screenY, enemyWidth, enemyHeight, null);
+                    }
+                    if(boss.getMotion() == 1){
+                        g2d.drawImage(bossImage1, screenX, screenY, enemyWidth, enemyHeight, null);
+                    }
+                    if(boss.getMotion() == 2){
+                        g2d.drawImage(bossImage2, screenX, screenY, enemyWidth, enemyHeight, null);
+                    }
+                }
             }
         }
     }
@@ -752,6 +763,7 @@ class Boss {
     int HP = 5;
     private final int MAX_HP = 5;
     private int attackCount = 0;
+    private int motion = 0;
 
     public Boss(Vec pos) {
         this.pos = pos;
@@ -772,6 +784,12 @@ class Boss {
     }
     void resetAttackCount(){
         this.attackCount = 0;
+    }
+    void setMotion(int x){
+        this.motion = x;
+    }
+    int getMotion(){
+        return this.motion;
     }
 }
 
