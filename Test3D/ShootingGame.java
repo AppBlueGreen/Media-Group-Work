@@ -227,14 +227,14 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
             if(getCanMove(new_pos)){
                 if(boss.pos.sub(player.getPos()).mag() < 15){
                     boss.addAttackCount();
-                    if(boss.getAttackCount() == 20){
+                    if(boss.getAttackCount() == 40){
                         player.subHP(5);
                         boss.resetAttackCount();
                     }
-                    if(7 <= boss.getAttackCount() && boss.getAttackCount() < 11){
+                    if(14 <= boss.getAttackCount() && boss.getAttackCount() < 22){
                         boss.setMotion(1);
                     }
-                    if(11 <= boss.getAttackCount() && boss.getAttackCount() < 20){
+                    if(22 <= boss.getAttackCount() && boss.getAttackCount() < 40){
                         boss.setMotion(2);
                     }
                     continue;
