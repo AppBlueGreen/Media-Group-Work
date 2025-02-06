@@ -1,6 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Random;
@@ -24,15 +25,81 @@ class Bullet {
 }
 
 class Enemy {
-    protected int x, y, size = 20;
+    protected int x, y, size;
 
     public Enemy(int x, int y) {
         this.x = x;
         this.y = y;
     }
 
+    public void draw(Graphics g) { }
+
+    public void moveTowardsPlayer(Player player) {
+        int playerCenterX = player.x + player.size / 2;
+        int playerCenterY = player.y + player.size / 2;
+
+        int enemyCenterX = x + size / 2;
+        int enemyCenterY = y + size / 2;
+
+        int dy = player.y - y;
+
+        if(dy < 200) {
+            if (playerCenterX < enemyCenterX) {
+                x -= 1;
+            } else {
+                x += 1;
+            }
+        }
+        if (playerCenterY < enemyCenterY) {
+            y -= 1;
+        } else {
+            y += 1;
+        }
+    }
+}
+
+class SmallEnemy extends Enemy {
+
+    int HP = 3;
+
+    public SmallEnemy(int x, int y) {
+        super(x, y);
+        size = 20;
+    }
+
+    @Override
+    public void draw(Graphics g) {
+        g.setColor(Color.ORANGE);
+        g.fillOval(x, y, size, size);
+    }
+}
+
+class Boss extends Enemy{
+
+    int HP = 30;
+
+    public Boss (int x, int y) { 
+        super(x, y);
+        size = 30;
+    }
+
+    @Override
     public void draw(Graphics g) {
         g.setColor(Color.RED);
+        g.fillOval(x, y, size, size);
+    }
+}
+
+class Player {
+    protected int x, y, size = 20;
+
+    public Player(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    public void draw(Graphics g) {
+        g.setColor(Color.BLUE);
         g.fillOval(x, y, size, size);
     }
 
@@ -60,20 +127,6 @@ class Enemy {
     }
 }
 
-class Player {
-    protected int x, y, size = 20;
-
-    public Player(int x, int y) {
-        this.x = x;
-        this.y = y;
-    }
-
-    public void draw(Graphics g) {
-        g.setColor(Color.BLUE);
-        g.fillOval(x, y, size, size);
-    }
-}
-
 class Fellow {
     protected int x, y, size = 20;
     protected int difference;
@@ -94,51 +147,157 @@ class Fellow {
     }
 }
 
-class PlusWall {
-    protected int width, x, y;
+class Wall {
+    protected int width, y;
     protected int x1, x2;
-    protected int plusNumber;
 
-    public PlusWall(int WIDTH, int y) {
+    public Wall(int WIDTH, int x, int y) {
         width = WIDTH / 2;
-        this.y = y;
-        x = (int)(Math.random() * width) + 1;
         x1 = x;
-        x2 = x + width;
-        // plusNumber = (int)(Math.random() * 5) + 1;
-        plusNumber = 1;
+        x2 = x1 + width;
+        this.y = y;
     }
 
-    public void draw(Graphics g) {
-        g.setColor(Color.BLUE);
-        g.drawLine(x1, y, x2, y);
-    }
+    public void draw(Graphics g) { }
 
-    public void move() {
-        y++;
-    }
+    public void move() { y++;}
 }
 
-class MinusWall {
-    protected int width, x, y, x1, x2;
-    protected int minusNumber;
 
-    public MinusWall(int WIDTH, int y) {
-        width = WIDTH / 2;
-        this.y = y;
-        x = (int)(Math.random() * width) + 1;
-        x1 = x;
-        x2 = x + width;
-        minusNumber = 1;
+
+class PlusWall extends Wall{
+
+    protected int plusNumber;
+
+    public PlusWall(int WIDTH, int x, int y) {
+        super(WIDTH, x, y);
+        plusNumber = (int)(Math.random() * 5) + 1;
     }
 
     public void draw(Graphics g) {
         g.setColor(Color.RED);
         g.drawLine(x1, y, x2, y);
     }
+}
 
-    public void move() {
-        y++;
+class MinusWall extends Wall{
+
+    protected int minusNumber;
+
+    public MinusWall(int WIDTH, int x, int y) {
+        super(WIDTH, x, y);
+        minusNumber = (int)(Math.random() * 10) + 1;
+    }
+
+    public void draw(Graphics g) {
+        g.setColor(Color.BLUE);
+        g.drawLine(x1, y, x2, y);
+    }
+}
+
+class Vec {
+   private double x;
+   private double y;
+
+   Vec(double var1, double var3) {
+      this.x = var1;
+      this.y = var3;
+   }
+
+   Vec add(Vec var1) {
+      return new Vec(this.x + var1.x, this.y + var1.y);
+   }
+
+   Vec sub(Vec var1) {
+      return new Vec(this.x - var1.x, this.y - var1.y);
+   }
+
+   Vec mult(double var1) {
+      return new Vec(this.x * var1, this.y * var1);
+   }
+
+   double mag() {
+      return Math.sqrt(this.x * this.x + this.y * this.y);
+   }
+
+   double getX() {
+      return this.x;
+   }
+
+   double getY() {
+      return this.y;
+   }
+
+   void setX(double var1) {
+      this.x = var1;
+   }
+
+   void setY(double var1) {
+      this.y = var1;
+   }
+}
+
+
+class Ray {
+    private Vec pos;
+    private Vec dir;
+
+    Ray(Vec pos, Vec dir) {
+        this.pos = pos;
+        this.dir = dir;
+    }
+
+    Vec getBegin() {
+        return this.pos;
+    }
+
+    Vec getEnd(double maxDistance) {
+        return this.pos.add(this.dir.mult(maxDistance)); // maxDistanceに基づいて終点を計算
+    }
+
+    Vec intersection(Ray other) {
+        double x1 = this.pos.getX(), y1 = this.pos.getY();
+        double x2 = this.getEnd(1000).getX(), y2 = this.getEnd(1000).getY();
+        double x3 = other.pos.getX(), y3 = other.pos.getY();
+        double x4 = other.getEnd(1).getX(), y4 = other.getEnd(1).getY();
+
+        
+        double denom = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
+        if (Math.abs(denom) < 1e-9) return null; // 平行の場合
+
+        double t = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) / denom;
+        double u = -((x1 - x2) * (y1 - y3) - (y1 - y2) * (x1 - x3)) / denom;
+
+        if (t >= 0 && u >= 0 && u <= 1) {
+            return new Vec(x1 + t * (x2 - x1), y1 + t * (y2 - y1));
+        }
+        return null;
+    }
+}
+
+class Building {
+    private double height;
+    ArrayList<Ray> lines;
+    Color color;
+
+    public Building(double height, ArrayList<Ray> lines, Color color) {
+        this.height = height;
+        this.lines = lines;
+        this.color = color;
+    }
+
+    public void draw(Graphics g) { }
+}
+
+class Building_1 extends Building{
+
+    public Building_1(double height, ArrayList<Ray> lines, Color color) {
+        super(height, lines, color);
+    }
+
+    @Override
+    public void draw(Graphics g) {
+        
     }
 }
 
@@ -147,11 +306,16 @@ class MinusWall {
 
 class ShootingModel {
     private ArrayList<Bullet> bullets = new ArrayList<>();
-    private ArrayList<Enemy> enemies = new ArrayList<>();
+
+    private ArrayList<SmallEnemy> smallEnemies = new ArrayList<>();
+    private ArrayList<Boss> bosses = new ArrayList<>();
+
     private ArrayList<Fellow> fellows = new ArrayList<>();
     private ArrayList<PlusWall> plusWalls = new ArrayList<>();
     private ArrayList<MinusWall> minusWalls = new ArrayList<>();
     private Player player;
+
+    int score = 0;
 
     public static final int WIDTH = 400;
     public static final int HEIGHT = 800;
@@ -159,28 +323,33 @@ class ShootingModel {
     public ShootingModel() {
         player = new Player(WIDTH / 2 - 10, HEIGHT - 100);
         spawnEnemies();
-        spawnPlusWall();
-        spawnMinusWall();
+        plusWalls.add(new PlusWall(WIDTH, 0, HEIGHT/2));
+        plusWalls.add(new PlusWall(WIDTH, WIDTH/2, HEIGHT/2));
     }
 
     // 出現に関するメソッド
+    public void spawnBoss() {
+        bosses.add(new Boss(WIDTH/2, 0));
+    }
+
     public void spawnEnemies() {
         for (int i = 0; i < 10; i++) {
-            enemies.add(new Enemy((int) (Math.random() * WIDTH), (int) (Math.random() * HEIGHT / 2)));
+            smallEnemies.add(new SmallEnemy((int) (Math.random() * WIDTH), (int) (Math.random() * HEIGHT / 4)));
         }
     }
 
-    public void spawnPlusWall() {
-        for (int i = 0; i < 2; i++) {
-            plusWalls.add(new PlusWall(WIDTH, (int)(Math.random() * HEIGHT / 2)));
-        }
-    }
+    public void spawnWall() {
 
-    public void spawnMinusWall() {
-        for (int i = 0; i < 2; i++) {
-            minusWalls.add(new MinusWall(WIDTH, (int)(Math.random() * HEIGHT / 2)));
+        double random = Math.random();
+
+        if(random < 0.500) {
+            plusWalls.add(new PlusWall(WIDTH, 0, 0));
+            minusWalls.add(new MinusWall(WIDTH, WIDTH/2 +5, 0));
+        } else {
+            plusWalls.add(new PlusWall(WIDTH, WIDTH/2 +5, 0));
+            minusWalls.add(new MinusWall(WIDTH, 0, 0));       
         }
-    }
+    }  
 
     public void spawnFellows(int number) {
         for (int i = 0; i < number; i++) {
@@ -196,8 +365,12 @@ class ShootingModel {
         return bullets;
     }
 
-    public ArrayList<Enemy> getEnemies() {
-        return enemies;
+    public ArrayList<SmallEnemy> getSmallEnemies() {
+        return smallEnemies;
+    }
+
+    public ArrayList<Boss> getBoss() {
+        return bosses;
     }
 
     public Player getPlayer() {
@@ -225,8 +398,14 @@ class ShootingModel {
     }
 
     public void updateEnemies() {
-        for (Enemy enemy : enemies) {
-            enemy.moveTowardsPlayer(player);
+        for (SmallEnemy smallEnemy : smallEnemies) {
+            smallEnemy.moveTowardsPlayer(player);
+        }
+    }
+
+    public void updateBoss() {
+        for (Boss boss : bosses) {
+            boss.moveTowardsPlayer(player);
         }
     }
 
@@ -247,14 +426,49 @@ class ShootingModel {
     // 衝突判定に関するメソッド
 
     public void checkCollisions() { // 弾と敵の衝突判定
-        Iterator<Enemy> enemyIterator = enemies.iterator();
-        while (enemyIterator.hasNext()) {
-            Enemy enemy = enemyIterator.next();
+        Iterator<SmallEnemy> smallEnemyIterator = smallEnemies.iterator();
+        while (smallEnemyIterator.hasNext()) {
+            SmallEnemy smallEnemy = smallEnemyIterator.next();
             for (Bullet bullet : bullets) {
                 if (new Rectangle(bullet.x, bullet.y, bullet.width, bullet.height)
-                        .intersects(new Rectangle(enemy.x, enemy.y, enemy.size, enemy.size))) {
-                    enemyIterator.remove();
+                        .intersects(new Rectangle(smallEnemy.x, smallEnemy.y, smallEnemy.size, smallEnemy.size))) {
+
+                    smallEnemy.HP--;
                     bullets.remove(bullet);
+                    
+                    if(smallEnemy.HP == 0) {
+                        smallEnemyIterator.remove();
+                        score++;
+
+                        if(score == 10) {
+                            spawnBoss();
+                        }
+                    }
+
+                    break;
+                }
+            }
+        }
+    }
+
+
+    public void checkBossllision() { // 弾とボスキャラの衝突判定
+        Iterator<Boss> bossIterator = bosses.iterator();
+        while (bossIterator.hasNext()) {
+            Boss boss = bossIterator.next();
+            for (Bullet bullet : bullets) {
+                if(new Rectangle(bullet.x, bullet.y, bullet.width, bullet.height).intersects(new Rectangle(boss.x, boss.y, boss.size, boss.size))) {
+
+                    boss.HP--;
+                    bullets.remove(bullet);
+                    
+                    if(boss.HP == 0) {
+                        bossIterator.remove(); 
+                        bosses.remove(boss);  
+                    }
+                          
+                         
+
                     break;
                 }
             }
@@ -263,7 +477,7 @@ class ShootingModel {
 
     public void checkPlusWallCollisions() { // playerとplusWallの衝突判定
         for (PlusWall plusWall : plusWalls) {
-            if (new Rectangle(player.x, player.y, player.size, player.size).intersects(new Rectangle(plusWall.x1, plusWall.y, plusWall.x2 - plusWall.x1, 1))) {
+            if (new Rectangle(player.x, player.y, player.size, 1).intersects(new Rectangle(plusWall.x1, plusWall.y, plusWall.x2 - plusWall.x1, 1))) {
                 spawnFellows(plusWall.plusNumber);
                 break;
             }
@@ -272,24 +486,27 @@ class ShootingModel {
 
     public void checkMinusWallCollisions() { // playerとminusWallの衝突判定
         for (MinusWall minusWall : minusWalls) {
-            if (new Rectangle(player.x, player.y, player.size, player.size).intersects(new Rectangle(minusWall.x1, minusWall.y, minusWall.x2 - minusWall.x1, 1))) {
-                
-                if (fellows.size() == 0)
-                    break;
-                fellows.remove(minusWall.minusNumber);
+            if (new Rectangle(player.x, player.y, player.size, 1).intersects(new Rectangle(minusWall.x1, minusWall.y, minusWall.x2 - minusWall.x1, 1))) {
+
+                int removeNumber = minusWall.minusNumber;
+                int fellowNumber = fellows.size();
+
+                if(removeNumber < fellowNumber) fellows.remove(removeNumber);
+                else if(fellowNumber < removeNumber) fellows.remove(fellowNumber);
+
                 break;
             }
         }
     }
 
     public void checkFellowCollisions() { // enemyとfellowの衝突判定
-        Iterator<Enemy> enemyIterator = enemies.iterator();
-        while (enemyIterator.hasNext()) {
-            Enemy enemy = enemyIterator.next();
+        Iterator<SmallEnemy> smallEnemyIterator = smallEnemies.iterator();
+        while (smallEnemyIterator.hasNext()) {
+            Enemy smallEnemy = smallEnemyIterator.next();
             for (Fellow fellow : fellows) {
                 if (new Rectangle(fellow.x, fellow.y, fellow.size, fellow.size)
-                        .intersects(new Rectangle(enemy.x, enemy.y, enemy.size, enemy.size))) {
-                    enemyIterator.remove();
+                        .intersects(new Rectangle(smallEnemy.x, smallEnemy.y, smallEnemy.size, smallEnemy.size))) {
+                    smallEnemyIterator.remove();
                     fellows.remove(fellow);
                     break;
                 }
@@ -320,8 +537,12 @@ class ViewPanel extends JPanel {
             bullet.draw(g);
         }
 
-        for (Enemy enemy : model.getEnemies()) {
-            enemy.draw(g);
+        for (Enemy smallEnemy : model.getSmallEnemies()) {
+            smallEnemy.draw(g);
+        }
+
+        for (Boss boss : model.getBoss()) {
+            boss.draw(g);
         }
 
         for (PlusWall plusWall : model.getPlusWall()) {
@@ -345,7 +566,9 @@ class ViewPanel extends JPanel {
 class Controller implements KeyListener, ActionListener {
     private ShootingModel model;
     private ViewPanel view;
-    private javax.swing.Timer timer;
+    private javax.swing.Timer timer, firingTimer, spawnTimer;
+
+    private boolean canFiringEvent = true;
 
     public Controller(ShootingModel model, ViewPanel view) {
         this.model = model;
@@ -353,16 +576,38 @@ class Controller implements KeyListener, ActionListener {
         this.timer = new javax.swing.Timer(20, this);
         this.timer.start();
         view.addKeyListener(this);
+
+        firingTimer = new javax.swing.Timer(1000, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                canFiringEvent = true;
+            }
+        });
+        firingTimer.start();
+
+        spawnTimer = new javax.swing.Timer(7000, new ActionListener() {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                model.spawnEnemies();
+                model.spawnWall();
+            }
+        });
+        spawnTimer.start();
     }
+
 
     @Override
     public void actionPerformed(ActionEvent e) {
+
         model.moveBullets();
         model.updateEnemies();
+        model.updateBoss();
         model.movePlusWalls();
         model.moveMinusWalls();
 
         model.checkCollisions();
+        model.checkBossllision();
         model.checkPlusWallCollisions();
         model.checkFellowCollisions();
         model.checkMinusWallCollisions();
@@ -376,17 +621,28 @@ class Controller implements KeyListener, ActionListener {
         ArrayList<Fellow> fellows = model.getFellows();
 
         if (e.getKeyCode() == KeyEvent.VK_LEFT && player.x > 0) {
+
             player.x -= 5;
             for (Fellow fellow : fellows) {
                 fellow.moveFellow(player);
             }
         } else if (e.getKeyCode() == KeyEvent.VK_RIGHT && player.x < ShootingModel.WIDTH - player.size) {
+
             player.x += 5;
             for (Fellow fellow : fellows) {
                 fellow.moveFellow(player);
             }
         } else if (e.getKeyCode() == KeyEvent.VK_SPACE) {
-            model.getBullets().add(new Bullet(player.x + player.size / 2 - 2, player.y));
+
+            if(canFiringEvent) {
+                
+                model.getBullets().add(new Bullet(player.x + player.size / 2 - 2, player.y));
+                for (Fellow fellow : fellows) {
+                    model.getBullets().add(new Bullet(fellow.x + fellow.size / 2 - 2, fellow.y));
+                }
+
+                canFiringEvent = false;
+            }
         }
     }
 
