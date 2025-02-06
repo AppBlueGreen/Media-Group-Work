@@ -40,6 +40,9 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
 
     // ゲームのタイマー
     private Timer timer;
+    // 銃に関するタイマー
+    private boolean canFiringEvent = true;
+    private Timer firingTimer;
 
     public ShootingGame() {
         this.setPreferredSize(new Dimension(WIDTH, HEIGHT));
@@ -118,6 +121,16 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
         timer.start();
         this.setFocusable(true);
         this.addKeyListener(this);
+
+        // 銃に関するタイマーの設定
+        firingTimer = new javax.swing.Timer(1000, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                canFiringEvent = true;
+            }
+        });
+        firingTimer.start();
+
 
         for(int i = 0; i < WIDTH; i++)
         for(int j = 0; j < HEIGHT; j++)
@@ -558,8 +571,13 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
         }
 
         if (e.getKeyCode() == KeyEvent.VK_SPACE) {
-            // 弾を発射
-            bullets.add(new Bullet(new Vec(player.getPos().getX() + 2 * Math.cos(player.getAngle() + Math.PI / 8), player.getPos().getY() + 2 * Math.sin(player.getAngle() + Math.PI / 8)), player.getAngle()));
+
+            if(canFiringEvent) {
+
+                // 弾を発射
+                bullets.add(new Bullet(new Vec(player.getPos().getX() + 2 * Math.cos(player.getAngle() + Math.PI / 8), player.getPos().getY() + 2 * Math.sin(player.getAngle() + Math.PI / 8)), player.getAngle()));
+                canFiringEvent = false;
+            }
         }
     }
 
