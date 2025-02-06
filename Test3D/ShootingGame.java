@@ -156,13 +156,13 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
         }
 
         // 敵を生成
-        spawnEnemies(10);
+        spawnEnemies(10, player.getPos(), Integer.MAX_VALUE);
     }
 
-    private void spawnEnemies(int num) {
+    private void spawnEnemies(int num, Vec pos, int dist) {
         for (int i = 0; i < num; ) {
             Vec NewEnemiePos = new Vec(Math.random() * FIELD_WIDTH, Math.random() * FIELD_HEIGHT / 2);
-            if(Map[(int)NewEnemiePos.getX()][(int)NewEnemiePos.getY()] == 0){
+            if(Map[(int)NewEnemiePos.getX()][(int)NewEnemiePos.getY()] == 0 && NewEnemiePos.sub(pos).mag() <= dist){
                 enemies.add(new Enemy(NewEnemiePos));
                 i++;
             }
@@ -206,7 +206,7 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
             if(getCanMove(new_pos)) {
                 if(enemy.pos.sub(player.getPos()).mag() < 15){
                     enemy.addAttackCount();
-                    if(enemy.getAttackCount() == 20){
+                    if(enemy.getAttackCount() == 40){
                         player.subHP(1);
                         enemy.resetAttackCount();
                     }
@@ -225,10 +225,12 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
             Vec new_pos = boss.pos.add((new Vec(direction.getX() / (len * 2), direction.getY() / (len * 2))));
             boss.setMotion(0);
             if(getCanMove(new_pos)){
-                if(boss.pos.sub(player.getPos()).mag() < 15){
+                if(boss.pos.sub(player.getPos()).mag() < 30){
                     boss.addAttackCount();
                     if(boss.getAttackCount() == 40){
+                        spawnEnemies(1, boss.pos, 10);
                         player.subHP(5);
+                        // bullets.add(new Bullet(new Vec(boss.pos.getX() - 2 * Math.cos(player.getAngle() + Math.PI / 32), boss.pos.getY() - 2 * Math.sin(player.getAngle() + Math.PI / 32)), -player.getAngle()));
                         boss.resetAttackCount();
                     }
                     if(14 <= boss.getAttackCount() && boss.getAttackCount() < 22){
@@ -590,6 +592,8 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
 
                 // 弾を発射
                 bullets.add(new Bullet(new Vec(player.getPos().getX() + 2 * Math.cos(player.getAngle() + Math.PI / 8), player.getPos().getY() + 2 * Math.sin(player.getAngle() + Math.PI / 8)), player.getAngle()));
+                // bullets.add(new Bullet(new Vec(player.getPos().getX() + 2 * Math.cos(player.getAngle() + Math.PI / 6 + Math.PI / 8), player.getPos().getY() + 2 * Math.sin(player.getAngle() +Math.PI / 6 + Math.PI / 8)), player.getAngle()+ Math.PI / 6 ));
+                // bullets.add(new Bullet(new Vec(player.getPos().getX() + 2 * Math.cos(player.getAngle() - Math.PI / 6  + Math.PI / 8), player.getPos().getY() + 2 * Math.sin(player.getAngle() - Math.PI / 6  + Math.PI / 8)), player.getAngle() - Math.PI / 6));
                 canFiringEvent = false;
             }
         }
