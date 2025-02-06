@@ -231,10 +231,10 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
                         player.subHP(5);
                         boss.resetAttackCount();
                     }
-                    if(10 <= boss.getAttackCount() && boss.getAttackCount() < 15){
+                    if(7 <= boss.getAttackCount() && boss.getAttackCount() < 11){
                         boss.setMotion(1);
                     }
-                    if(15 <= boss.getAttackCount() && boss.getAttackCount() < 20){
+                    if(11 <= boss.getAttackCount() && boss.getAttackCount() < 20){
                         boss.setMotion(2);
                     }
                     continue;
