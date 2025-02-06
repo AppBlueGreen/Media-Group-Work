@@ -299,10 +299,16 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
             g2d.setColor(building.color);
             g2d.setStroke(new BasicStroke(1));
 
-            for(Ray wall : building.lines) {
-                g2d.drawLine((int) wall.getBegin().getX() / 7 + 20, (int) wall.getBegin().getY() / 7 + 20,
-                (int) wall.getEnd(1).getX() / 7 + 20, (int) wall.getEnd(1).getY() / 7 + 20);
-            }
+            // for(Ray wall : building.lines) {
+            //     g2d.drawLine((int) wall.getBegin().getX() / 7 + 20, (int) wall.getBegin().getY() / 7 + 20,
+            //     (int) wall.getEnd(1).getX() / 7 + 20, (int) wall.getEnd(1).getY() / 7 + 20);
+            // }
+
+            int positionX = (int)building.lines.get(0).getBegin().getX();
+            int positionY = (int)building.lines.get(0).getBegin().getY();
+            int width = (int)building.getWidth();
+            int vertical = (int)building.getVertical();
+            g2d.fillRect(positionX / 7 + 20, positionY / 7 + 20, width / 7, vertical / 7);
         }
 
         // フィールドの限界を描画
