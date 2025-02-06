@@ -40,6 +40,9 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
 
     // ゲームのタイマー
     private Timer timer;
+    // 銃に関するタイマー
+    private boolean canFiringEvent = true;
+    private Timer firingTimer;
 
     public ShootingGame() {
         this.setPreferredSize(new Dimension(WIDTH, HEIGHT));
@@ -118,6 +121,16 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
         timer.start();
         this.setFocusable(true);
         this.addKeyListener(this);
+
+        // 銃に関するタイマーの設定
+        firingTimer = new javax.swing.Timer(1000, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                canFiringEvent = true;
+            }
+        });
+        firingTimer.start();
+
 
         for(int i = 0; i < WIDTH; i++)
         for(int j = 0; j < HEIGHT; j++)
@@ -517,21 +530,54 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
 
     @Override
     public void keyPressed(KeyEvent e) {
-        // if (e.getKeyCode() == KeyEvent.VK_LEFT && playerPos.getX() > 0) {
-        //     player.setPos(new Vec(player.getPos().getX() - 10, player.getPos().getY()));
-        // }
-        // if (e.getKeyCode() == KeyEvent.VK_RIGHT && playerPos.getX() < WIDTH) {
-        //     player.setPos(new Vec(player.getPos().getX() + 10, player.getPos().getY()));
-        // }
+
+        Vec new_pos = new Vec(player.getPos().getX(), player.getPos().getY());
+        
+
         if (e.getKeyCode() == KeyEvent.VK_LEFT ) player.setAngle(player.getAngle() - Math.PI / 36);
         if (e.getKeyCode() == KeyEvent.VK_RIGHT) player.setAngle(player.getAngle() + Math.PI / 36);
-        if (e.getKeyCode() == KeyEvent.VK_W   ) player.setPos(new Vec(player.getPos().getX() + Math.cos(player.getAngle()), player.getPos().getY() + Math.sin(player.getAngle())));
-        if (e.getKeyCode() == KeyEvent.VK_S   ) player.setPos(new Vec(player.getPos().getX() - Math.cos(player.getAngle()), player.getPos().getY() - Math.sin(player.getAngle())));
-        if (e.getKeyCode() == KeyEvent.VK_D   ) player.setPos(new Vec(player.getPos().getX() - Math.sin(player.getAngle()), player.getPos().getY() + Math.cos(player.getAngle())));
-        if (e.getKeyCode() == KeyEvent.VK_A   ) player.setPos(new Vec(player.getPos().getX() + Math.sin(player.getAngle()), player.getPos().getY() - Math.cos(player.getAngle())));
+
+        if (e.getKeyCode() == KeyEvent.VK_W   ){
+            new_pos.setX(player.getPos().getX() + Math.cos(player.getAngle()));
+            new_pos.setY(player.getPos().getY() + Math.sin(player.getAngle()));
+            if(Map[(int)new_pos.getX()][(int)new_pos.getY()] == 0) {
+                player.setPos(new_pos);
+            }
+        }
+        
+        if (e.getKeyCode() == KeyEvent.VK_S   ) {
+            new_pos.setX(player.getPos().getX() - Math.cos(player.getAngle()));
+            new_pos.setY(player.getPos().getY() - Math.sin(player.getAngle()));
+            if(Map[(int)new_pos.getX()][(int)new_pos.getY()] == 0) {
+                player.setPos(new_pos);
+            }
+        }
+
+        if (e.getKeyCode() == KeyEvent.VK_D   ) {
+            new_pos.setX(player.getPos().getX() - Math.sin(player.getAngle()));
+            new_pos.setY(player.getPos().getY() + Math.cos(player.getAngle()));
+            if(Map[(int)new_pos.getX()][(int)new_pos.getY()] == 0) {
+                player.setPos(new_pos);
+            }
+        }
+
+        if (e.getKeyCode() == KeyEvent.VK_A   ) {
+            new_pos.setX(player.getPos().getX() + Math.sin(player.getAngle()));
+            new_pos.setY(player.getPos().getY() - Math.cos(player.getAngle()));
+            if(Map[(int)new_pos.getX()][(int)new_pos.getY()] == 0) {
+                player.setPos(new_pos);
+            }
+
+        }
+
         if (e.getKeyCode() == KeyEvent.VK_SPACE) {
-            // 弾を発射
-            bullets.add(new Bullet(new Vec(player.getPos().getX() + 2 * Math.cos(player.getAngle() + Math.PI / 8), player.getPos().getY() + 2 * Math.sin(player.getAngle() + Math.PI / 8)), player.getAngle()));
+
+            if(canFiringEvent) {
+
+                // 弾を発射
+                bullets.add(new Bullet(new Vec(player.getPos().getX() + 2 * Math.cos(player.getAngle() + Math.PI / 8), player.getPos().getY() + 2 * Math.sin(player.getAngle() + Math.PI / 8)), player.getAngle()));
+                canFiringEvent = false;
+            }
         }
     }
 
