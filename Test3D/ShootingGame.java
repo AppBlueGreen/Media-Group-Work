@@ -44,7 +44,7 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
     public ShootingGame() {
         this.setPreferredSize(new Dimension(WIDTH, HEIGHT));
 
-        enemyImage = new ImageIcon(getClass().getResource("/risaju.png")).getImage();
+        enemyImage = new ImageIcon(getClass().getResource("/ma-rusu.png")).getImage();
         bossImage = new ImageIcon(getClass().getResource("/risaju.png")).getImage();
         gun = new ImageIcon(getClass().getResource("/gun.png")).getImage();
         // buckGraund = new ImageIcon(getClass().getResource("/Default_superflat_world.png")).getImage();
@@ -185,6 +185,8 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
         // 背景画像を描画
         g2d.drawImage(backgrounds[index], 0, -5, WIDTH, HEIGHT + 5, null);
 
+
+
         // 敵を描画
         g2d.setColor(Color.RED);
 
@@ -226,7 +228,9 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
             getWallhits(wallHits,  player,  angle,  fov,  enemies, bullets);
         }
         draw3DWalls(g2d, wallHits, player, fov, enemies, bullets, buildings);
-        g2d.drawImage(gun, (WIDTH / 2) + 120, (HEIGHT / 2) - 250, 600, 600, null);
+
+        // 銃表示
+        g2d.drawImage(gun, (WIDTH / 2) - 150, (HEIGHT / 2) - 330, 700, 700, null);
 
         g2d.setColor(Color.BLACK);
         g2d.fillRect(WIDTH / 2 - 20, HEIGHT / 2, 40, 2);
@@ -260,6 +264,12 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
                 g2d.drawLine((int) wall.getBegin().getX() / 7 + 20, (int) wall.getBegin().getY() / 7 + 20,
                 (int) wall.getEnd(1).getX() / 7 + 20, (int) wall.getEnd(1).getY() / 7 + 20);
             }
+        }
+
+        // boss描画
+        g2d.setColor(Color.BLACK);
+        for (Boss boss : bosses) {
+            g2d.fillOval((int) boss.pos.getX() / 7 + 20, (int) boss.pos.getY() / 7 + 20, boss.size, boss.size);
         }
 
         // フィールドの限界を描画
@@ -343,6 +353,30 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
             }
         }
 
+        Iterator<Boss> bossIterator = bosses.iterator();
+        while (bossIterator.hasNext()) {
+            Boss boss = bossIterator.next();
+            for (Bullet bullet : bullets) {
+                if (new Rectangle((int) bullet.pos.getX(), (int) bullet.pos.getY(), bullet.width, bullet.height)
+                        .intersects(new Rectangle((int) boss.pos.getX(), (int) boss.pos.getY(), boss.size, boss.size))) {
+                        
+                    boss.HP--;
+                    bullets.remove(bullet);
+                        
+                    if (boss.HP == 0) {
+                        bossIterator.remove();
+                        player.addScore();
+                    
+                        // ボスを倒した後の処理（例: 次のステージへ）
+                        if (player.getScore() >= 10) {
+                            // nextStage();
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+
         // 再描画
         repaint();
     }
@@ -391,6 +425,16 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
                 }
             }
         }
+        for (Boss boss : bosses) {
+            Ray beam = new Ray(player.getPos(), new Vec(Math.cos(angle), Math.sin(angle)));
+            Ray wall = new Ray(boss.pos, new Vec(1 * Math.cos(player.getAngle()), 1 * Math.sin(player.getAngle())));
+            Vec hit = beam.intersection(wall);
+            if (hit != null) {
+                double wallDist = hit.sub(player.getPos()).mag();
+                double wallPerpDist = wallDist * Math.cos(angle - player.getAngle()); // 修正点
+                wallHits.add(new WallHit(hit, wallPerpDist, angle, Color.RED, 5));
+            }
+        }
     }
     private void draw3DWalls(Graphics2D g2d, ArrayList<WallHit> wallHits, Player player, double fov, ArrayList<Enemy> enemies, ArrayList<Bullet> bullets, ArrayList<Building> buildings) {
         
@@ -430,6 +474,14 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
                 g2d.setColor(wallHit.color);
                 int screenX = (int) (getWidth() / 2 + (wallHit.angle - player.getAngle()) * getWidth() / fov);
                 g2d.drawLine(screenX, wallY1, screenX, wallY2);
+            }
+            if(wallHit.wallNumber == 5){
+                int enemyHeight = (int) Math.min(HEIGHT, 3000 / wallHit.distance);
+                int enemyWidth = enemyHeight; // 正方形と仮定
+    
+                int screenX = (int) (getWidth() / 2 + (wallHit.angle - player.getAngle()) * getWidth() / fov - enemyWidth / 2);
+                int screenY = screenCenterY - enemyHeight / 2;
+                g2d.drawImage(bossImage, screenX, screenY, enemyWidth, enemyHeight, null);
             }
         }
     }
@@ -617,7 +669,7 @@ class Enemy {
 }
 class Boss {
     Vec pos;
-    int size = 40;
+    int size = 6;
     int HP = 5;
     private final int MAX_HP = 5;
 
