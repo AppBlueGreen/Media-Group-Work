@@ -532,7 +532,7 @@ public class ShootingGame extends JPanel implements ActionListener, KeyListener 
                 int enemyHeight = (int) Math.min(HEIGHT, 3000 / wallHit.distance);
                 int enemyWidth = enemyHeight; // 正方形と仮定
                 int screenX = (int) (getWidth() / 2 + (wallHit.angle - player.getAngle()) * getWidth() / fov - enemyWidth / 2);
-                int screenY = screenCenterY - enemyHeight / 2;
+                int screenY = screenCenterY - (enemyHeight / 2);
     
                 for(Boss boss: bosses){
                     if(boss.getMotion() == 0){

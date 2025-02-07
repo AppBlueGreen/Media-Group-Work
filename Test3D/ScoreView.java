@@ -20,9 +20,13 @@ public class ScoreView extends JPanel {
         setLayout(new BorderLayout());
 
         //ScoreView画面の背景、うまくできない
-        JLabel startbackimage = new JLabel("<html><img src='file:start5.jpg' width=805 height=580></html>", JLabel.CENTER);
-        add(startbackimage, BorderLayout.CENTER);
+        // JLabel startbackimage = new JLabel("<html><img src='file:start5.jpg' width=805 height=580></html>", JLabel.CENTER);
+        // add(startbackimage, BorderLayout.CENTER);
 
+        // 背景画像の設定
+        ImageIcon backgroundIcon = new ImageIcon(getClass().getResource("/start5.jpg"));
+        JLabel startbackimage = new JLabel(backgroundIcon);
+        add(startbackimage, BorderLayout.CENTER);
         // Game Clearの文字
         JLabel titleLabel = new JLabel("Game Clear!!", JLabel.CENTER);
         titleLabel.setFont(new Font("MS Gothic", Font.BOLD, 32));
