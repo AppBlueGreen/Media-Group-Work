@@ -7,9 +7,11 @@ import java.awt.event.ActionListener;
 
 public class CourseSelectView extends JPanel {
     private Main main;
+    private Image backgroundImage; // 背景画像
 
     public CourseSelectView(Main main) {
         this.main = main;
+        this.backgroundImage = new ImageIcon(getClass().getResource("/CourseSelectViewBack.jpg")).getImage();
         setLayout(new BorderLayout());
 
         // 「ステージを選択して、Start Gameを押してください」のラベル (上部配置)
@@ -41,7 +43,11 @@ public class CourseSelectView extends JPanel {
         // ボタンパネルを中央配置
         add(buttonPanel, BorderLayout.CENTER);
     }
-
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        g.drawImage(backgroundImage, 0, 30, getWidth(), getHeight(), this);
+    }
     private JPanel createButtonWithLabel(JButton button, String text) {
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
@@ -49,6 +55,12 @@ public class CourseSelectView extends JPanel {
 
         JLabel label = new JLabel(text, JLabel.CENTER);
         label.setFont(new Font("MS Gothic", Font.PLAIN, 18));
+
+        if ("西地区".equals(text)) {
+            label.setForeground(Color.YELLOW);
+        } else if ("東地区".equals(text)) {
+            label.setForeground(Color.GREEN);
+        }
 
         panel.add(button, BorderLayout.CENTER);
         panel.add(label, BorderLayout.SOUTH);
