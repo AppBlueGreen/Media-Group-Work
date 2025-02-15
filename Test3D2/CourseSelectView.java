@@ -9,7 +9,7 @@ public class CourseSelectView extends JPanel {
 
     public CourseSelectView(Main main) {
         this.main = main;
-        this.backgroundImage = new ImageIcon(getClass().getResource("/CourseSelectViewBack.jpg")).getImage();
+        this.backgroundImage = new ImageIcon(getClass().getResource("/Image/CourseSelectViewBack.jpg")).getImage();
         setLayout(new BorderLayout());
 
         // 「ステージを選択して、Start Gameを押してください」のラベル (上部配置)
@@ -18,8 +18,8 @@ public class CourseSelectView extends JPanel {
         add(courseLabel, BorderLayout.NORTH);
 
         // 画像の読み込みとリサイズ
-        ImageIcon buttonIcon1 = resizeIcon(new ImageIcon("nishi.png"), 300, 200);
-        ImageIcon buttonIcon2 = resizeIcon(new ImageIcon("higashi.png"), 300, 200);
+        ImageIcon buttonIcon1 = resizeIcon(new ImageIcon("Image/nishi.png"), 300, 200);
+        ImageIcon buttonIcon2 = resizeIcon(new ImageIcon("Image/higashi.png"), 300, 200);
 
         // ボタンの作成
         JButton nishiButton = createImageButton(buttonIcon1);

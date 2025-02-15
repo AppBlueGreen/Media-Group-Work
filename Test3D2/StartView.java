@@ -13,7 +13,7 @@ public class StartView extends JPanel {
         setLayout(new BorderLayout());
 
         //StartView画面の背景
-        JLabel startbackimage = new JLabel("<html><img src='file:start5.jpg' width=805 height=580></html>", JLabel.CENTER);
+        JLabel startbackimage = new JLabel("<html><img src='file:Image/start5.jpg' width=805 height=580></html>", JLabel.CENTER);
         add(startbackimage, BorderLayout.CENTER);
 
         setFocusable(true);

@@ -29,11 +29,11 @@ public class SharedData {
     public static ArrayList<Map> Maps = new ArrayList<>();
 
     // 敵の画像
-    public static Image enemyImage = new ImageIcon(SharedData.class.getResource("/ma-rusu.png")).getImage();;
-    public static Image bossImage0 = new ImageIcon(SharedData.class.getResource("/risaju.png")).getImage();;
-    public static Image bossImage1 = new ImageIcon(SharedData.class.getResource("/risaju2.png")).getImage();;
-    public static Image bossImage2 = new ImageIcon(SharedData.class.getResource("/risaju1.png")).getImage();;
-    public static Image gun = new ImageIcon(SharedData.class.getResource("/gun.png")).getImage();
+    public static Image enemyImage = new ImageIcon(SharedData.class.getResource("/Image/ma-rusu.png")).getImage();;
+    public static Image bossImage0 = new ImageIcon(SharedData.class.getResource("/Image/risaju.png")).getImage();;
+    public static Image bossImage1 = new ImageIcon(SharedData.class.getResource("/Image/risaju2.png")).getImage();;
+    public static Image bossImage2 = new ImageIcon(SharedData.class.getResource("/Image/risaju1.png")).getImage();;
+    public static Image gun = new ImageIcon(SharedData.class.getResource("/Image/gun.png")).getImage();
     ;
     // 背景画像
     public static final int TOTAL_BACKGROUNDS = 36;
@@ -47,7 +47,7 @@ public class SharedData {
     private static void loadBackgrounds(){
         for (int i = 0; i < TOTAL_BACKGROUNDS; i++) {
             try {
-                backgrounds[i] = ImageIO.read(new File("background" + (i + 1) + ".png"));
+                backgrounds[i] = ImageIO.read(new File("Image/background" + (i + 1) + ".png"));
             } catch (IOException e) {
                 e.printStackTrace();
                 System.exit(1); // 画像がロードできない場合は終了
