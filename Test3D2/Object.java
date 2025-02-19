@@ -52,7 +52,7 @@ class Player {
         return this.score;
     }
     void subHP(int x){
-        this.HP -= x;;
+        this.HP -= x;
     }
     int getHP() {
         return HP;

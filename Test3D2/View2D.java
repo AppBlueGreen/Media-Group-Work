@@ -137,6 +137,9 @@ public class View2D extends JPanel implements ActionListener, KeyListener{
                     enemy.addAttackCount();
                     if(enemy.getAttackCount() == 40){
                         map.player.subHP(1);
+                        if(map.player.getHP() == 0){
+                            main.showCourseSelectView();
+                        }
                         enemy.resetAttackCount();
                     }
                     continue;
@@ -161,6 +164,9 @@ public class View2D extends JPanel implements ActionListener, KeyListener{
                         map.player.subHP(5);
                         // bullets.add(new Bullet(new Vec(boss.pos.getX() - 2 * Math.cos(map.player.getAngle() + Math.PI / 32), boss.pos.getY() - 2 * Math.sin(map.player.getAngle() + Math.PI / 32)), -map.player.getAngle()));
                         boss.resetAttackCount();
+                        if(map.player.getHP() <= 0){
+                            main.showCourseSelectView();
+                        }
                     }
                     if(14 <= boss.getAttackCount() && boss.getAttackCount() < 22){
                         boss.setMotion(1);
